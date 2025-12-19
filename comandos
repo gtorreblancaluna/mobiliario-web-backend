@@ -1,0 +1,21 @@
+
+docker build -t gcr.io/windy-container-237418/mob-gaby-test:v2 .
+----------------------------------------------------------------------
+docker push gcr.io/windy-container-237418/mob-gaby-test:v2
+----------------------------------------------------------------------
+gcloud run deploy spring-java21-service \
+    --image gcr.io/windy-container-237418/mob-gaby-test:v2 \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --set-env-vars JASYPT_ENCRYPTOR_PASSWORD=mypassword \
+    --memory 512Mi \
+    --min-instances 0 \
+    --timeout 900
+
+----------------------------------------------------------------------
+jasyppt
+-- Encrypt
+mvn jasypt:encrypt-value -Djasypt.encryptor.password=javatechie -Djasypt.plugin.value=Password
+-- Decrypt
+mvn jasypt:decrypt-value -Djasypt.encryptor.password=javatechie -Djasypt.plugin.value=nObqvmVPYhxVaykMl09QVtGCQWjpd7al1RJhOsyz1eLkb6J2USMu9Fb//e4a6Vro
