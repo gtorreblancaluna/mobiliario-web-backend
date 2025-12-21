@@ -15,7 +15,7 @@ public record RentaTotalesResponseDTO(
 
     public static RentaTotalesResponseDTO calculateTotals
             (Renta renta,
-             List<DetailRenta> detail, List<AbonoResponseDTO> abonos) {
+             List<DetailRenta> detail, List<AbonoResponseDTO> payments) {
 
         float subTotalItems = 0F;
         float totalDiscount = 0F;
@@ -27,7 +27,7 @@ public record RentaTotalesResponseDTO(
         float depositoGarantia =
                 renta.getDepositoGarantia() != null ? renta.getDepositoGarantia() : 0F;
 
-        float totalAbonos = abonos.stream()
+        float totalPayments = payments.stream()
                 .map(AbonoResponseDTO::payment) // Extrae el valor del abono
                 .filter(p -> p != null)        // Seguridad: evita NullPointerException
                 .reduce(0f, Float::sum);       // Suma todos los valores
@@ -62,14 +62,14 @@ public record RentaTotalesResponseDTO(
 
         totalCalculoConIVA = (subTotalItems + envioRecoleccion + depositoGarantia + calculoIVA) - totalDiscount;
 
-        float total = totalCalculoConIVA - totalAbonos;
+        float total = totalCalculoConIVA - totalPayments;
 
         return new RentaTotalesResponseDTO(
                 total,
                 calculoIVA,
                 totalDiscount,
                 subTotalItems,
-                totalAbonos
+                totalPayments
         );
     }
 
