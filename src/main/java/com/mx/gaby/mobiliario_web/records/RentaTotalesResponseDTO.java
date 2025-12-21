@@ -4,9 +4,8 @@ import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
 import com.mx.gaby.mobiliario_web.model.entitites.Renta;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public record RentaTotalesDTOResponse (
+public record RentaTotalesResponseDTO(
         Float total,
         Float totalIva,
         Float totalDiscount,
@@ -14,7 +13,7 @@ public record RentaTotalesDTOResponse (
         Float totalPayments
 ) {
 
-    public static RentaTotalesDTOResponse calculateTotals
+    public static RentaTotalesResponseDTO calculateTotals
             (Renta renta,
              List<DetailRenta> detail, List<AbonoResponseDTO> abonos) {
 
@@ -65,9 +64,9 @@ public record RentaTotalesDTOResponse (
 
         float total = totalCalculoConIVA - totalAbonos;
 
-        return new RentaTotalesDTOResponse(
+        return new RentaTotalesResponseDTO(
                 total,
-                totalCalculoConIVA,
+                calculoIVA,
                 totalDiscount,
                 subTotalItems,
                 totalAbonos

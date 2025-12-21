@@ -47,7 +47,7 @@ public record RentaResponseDTO(
         Timestamp createdAt,
         String tipo,
         List<DetailRentaResponseDTO> detail,
-        RentaTotalesDTOResponse totals
+        RentaTotalesResponseDTO totals
 ) {
 
     public static String formatDate (String initDateString) {
@@ -71,6 +71,7 @@ public record RentaResponseDTO(
             return "ERROR: Formato de fecha de entrada inválido. Se esperaba " + ApplicationConstant.FORMAT_DATE_DD_MM_YYY;
         }
     }
+
     /**
      * Método estático para mapear la Entidad Renta al DTO de Respuesta.
      * @param renta La entidad Renta.
@@ -79,7 +80,7 @@ public record RentaResponseDTO(
 
     public static RentaResponseDTO fromEntity(Renta renta,
                                               List<DetailRentaResponseDTO> detail,
-                                              RentaTotalesDTOResponse totals) {
+                                              RentaTotalesResponseDTO totals) {
         return new RentaResponseDTO(
                 renta.getId(),
                 renta.getState() != null ? renta.getState().getId() : null,
@@ -96,11 +97,11 @@ public record RentaResponseDTO(
                 renta.getChofer() != null ? renta.getChofer().getName()
                         + ApplicationConstant.BLANK_SPACE + renta.getChofer().getLastName() : null,
 
-                renta.getFechaPedido(),
+                formatDate(renta.getFechaPedido()),
                 formatDate(renta.getFechaEntrega()),
-                renta.getFechaEvento(),
+                formatDate(renta.getFechaEvento()),
                 renta.getHoraEntrega(),
-                renta.getFechaDevolucion(),
+                formatDate(renta.getFechaDevolucion()),
                 renta.getHoraDevolucion(),
 
                 renta.getDescripcion(),

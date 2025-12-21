@@ -13,7 +13,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class RentaQueryServiceImpl implements RentaQueryService{
@@ -52,8 +51,8 @@ public class RentaQueryServiceImpl implements RentaQueryService{
                         .map(DetailRentaResponseDTO::fromEntity)
                         .toList();
 
-        RentaTotalesDTOResponse totals
-                = RentaTotalesDTOResponse.calculateTotals(renta,detail,abonos);
+        RentaTotalesResponseDTO totals
+                = RentaTotalesResponseDTO.calculateTotals(renta,detail,abonos);
 
         return RentaResponseDTO.fromEntity(renta,detailRentas,totals);
     }
