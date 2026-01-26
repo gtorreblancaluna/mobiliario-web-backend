@@ -58,6 +58,9 @@ public class Item {
     @Column(name = "fecha_ultima_modificacion")
     private Timestamp updatedAt;
 
+    @Column(name = "activo")
+    private String fgActive;
+
     @Lob
     @Column(name = "image", columnDefinition = "BLOB", nullable = true)
     private byte[] image;

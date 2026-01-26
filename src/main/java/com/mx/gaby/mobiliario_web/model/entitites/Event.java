@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Table(name = "renta")
-public class Renta {
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Renta {
     @JoinColumn(name = "id_clientes",
             nullable = false,
             referencedColumnName = "id_clientes")
-    private Cliente customer;
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "id_usuarios",
@@ -63,15 +63,12 @@ public class Renta {
     @JoinColumn(name = "id_tipo",
             nullable = false,
             referencedColumnName = "id_tipo")
-    private Tipo tipo;
+    private TypeRenta type;
 
     private Float depositoGarantia;
     private Float envioRecoleccion;
     private String mostrarPreciosPdf;
     private Timestamp updatedAt;
     private Timestamp createdAt;
-
-
-
 
 }

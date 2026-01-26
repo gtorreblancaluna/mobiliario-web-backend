@@ -1,20 +1,30 @@
-# -- FASE 1: BUILD (Compilación con JDK 21) --
+# -- FASE 1: BUILD --
 FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
-# Copia archivos de Maven y fuente
+
+# 1. Copiamos solo lo necesario para descargar dependencias (Caché de Docker)
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-COPY src ./src
-# Compila el proyecto
-RUN ./mvnw clean install -DskipTests
+RUN ./mvnw dependency:go-offline -B
 
-# -- FASE 2: RUNTIME (Ejecución con JRE 21) --
-# Usa una imagen JRE ligera compatible con Java 21
-FROM eclipse-temurin:21-jre
+# 2. Copiamos el código fuente y compilamos
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# -- FASE 2: RUNTIME --
+# Usamos alpine si buscas ligereza extrema, o la estándar para máxima compatibilidad
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-# Cloud Run espera que el contenedor escuche en el puerto 8080 por defecto
-EXPOSE 8080
-# Copia el JAR final de la fase de construcción
+
+# 3. Flags de rendimiento para contenedores
+# -XX:+UseContainerSupport: Hace que la JVM respete los límites de Cloud Run
+# MaxRAMPercentage: Evita errores de memoria (OOM)
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+
 COPY --from=builder /app/target/*.jar app.jar
-# Comando de ejecución
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+EXPOSE 8080
+
+# 4. ENTRYPOINT flexible
+# Usamos "sh -c" para que las variables de entorno se expandan correctamente
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

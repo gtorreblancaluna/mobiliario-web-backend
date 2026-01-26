@@ -1,7 +1,7 @@
 package com.mx.gaby.mobiliario_web.records;
 
 import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
-import com.mx.gaby.mobiliario_web.model.entitites.Renta;
+import com.mx.gaby.mobiliario_web.model.entitites.Event;
 
 import java.util.List;
 
@@ -14,21 +14,21 @@ public record RentaTotalesResponseDTO(
 ) {
 
     public static RentaTotalesResponseDTO calculateTotals
-            (Renta renta,
-             List<DetailRenta> detail, List<AbonoResponseDTO> payments) {
+            (Event event,
+             List<DetailRenta> detail, List<PaymentDTO> payments) {
 
         float subTotalItems = 0F;
         float totalDiscount = 0F;
         float calculoIVA = 0f;
-        float totalCalculoConIVA = 0f;
+        float totalCalculoConIVA;
 
         float envioRecoleccion =
-                renta.getEnvioRecoleccion() != null ? renta.getEnvioRecoleccion() : 0F;
+                event.getEnvioRecoleccion() != null ? event.getEnvioRecoleccion() : 0F;
         float depositoGarantia =
-                renta.getDepositoGarantia() != null ? renta.getDepositoGarantia() : 0F;
+                event.getDepositoGarantia() != null ? event.getDepositoGarantia() : 0F;
 
         float totalPayments = payments.stream()
-                .map(AbonoResponseDTO::payment) // Extrae el valor del abono
+                .map(PaymentDTO::amount) // Extrae el valor del abono
                 .filter(p -> p != null)        // Seguridad: evita NullPointerException
                 .reduce(0f, Float::sum);       // Suma todos los valores
 
@@ -47,8 +47,8 @@ public record RentaTotalesResponseDTO(
             subTotalItems += subtotalByItem - totalDiscountByItem;
         }
 
-        if (renta.getPorcentajeDescuento() != null) {
-            float percentage = Float.parseFloat(renta.getPorcentajeDescuento());
+        if (event.getPorcentajeDescuento() != null) {
+            float percentage = Float.parseFloat(event.getPorcentajeDescuento());
             if (percentage > 0F) {
                 totalDiscount = subTotalItems * (percentage / 100);
             }
@@ -56,8 +56,8 @@ public record RentaTotalesResponseDTO(
 
         float calculoSinIVA = (subTotalItems + envioRecoleccion + depositoGarantia) - totalDiscount;
 
-        if (renta.getIva() != null && renta.getIva() > 0F) {
-            calculoIVA = calculoSinIVA * (renta.getIva() / 100);
+        if (event.getIva() != null && event.getIva() > 0F) {
+            calculoIVA = calculoSinIVA * (event.getIva() / 100);
         }
 
         totalCalculoConIVA = (subTotalItems + envioRecoleccion + depositoGarantia + calculoIVA) - totalDiscount;

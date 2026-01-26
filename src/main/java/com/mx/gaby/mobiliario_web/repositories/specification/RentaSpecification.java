@@ -2,7 +2,7 @@ package com.mx.gaby.mobiliario_web.repositories.specification;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
-import com.mx.gaby.mobiliario_web.model.entitites.Renta;
+import com.mx.gaby.mobiliario_web.model.entitites.Event;
 import com.mx.gaby.mobiliario_web.records.RentaFilterDTO;
 import com.mx.gaby.mobiliario_web.utils.ValidateUtil;
 import jakarta.persistence.criteria.Expression;
@@ -21,12 +21,12 @@ public class RentaSpecification {
             = DateTimeFormatter.ofPattern(ApplicationConstant.FORMAT_DATE_DD_MM_YYY);
 
     // Metodo principal para construir la Specification combinada
-    public static Specification<Renta> applyFilter(RentaFilterDTO rentaFilterDTO) {
+    public static Specification<Event> applyFilter(RentaFilterDTO rentaFilterDTO) {
 
         // Inicializa la Specification con el primer criterio.
         // Si tienesNombre() devuelve null (porque nombre es nulo), el where() actúa como un 'true'
 
-        Specification<Renta> spec = Specification.where(all());
+        Specification<Event> spec = Specification.where(all());
 
         boolean filterApplied = false;
 
@@ -59,14 +59,13 @@ public class RentaSpecification {
      * Devuelve una Specification que no aplica filtros (WHERE 1=1).
      * Garantiza que la Specification devuelta NUNCA es null.
      */
-    public static Specification<Renta> all() {
-        return (root, query, builder) -> {
-            // Predicate que siempre es verdadero (AND de cero condiciones)
-            return builder.conjunction();
-        };
+    public static Specification<Event> all() {
+        // builder.conjunction() crea un predicado 'TRUE' constante.
+        // No requiere procesamiento de columnas, por lo que es óptimo.
+        return (root, query, cb) -> cb.conjunction();
     }
 
-    public static Specification<Renta> orderByDesc(String nameColumnInEntity) {
+    public static Specification<Event> orderByDesc(String nameColumnInEntity) {
 
 
         return (root, query, builder) -> {
@@ -87,10 +86,8 @@ public class RentaSpecification {
 
     /**
      * Filtra las Renta donde la fechaEntrega (VARCHAR) está dentro del rango.
-     * @param initDate La fecha de inicio como String (ej. '01/12/2025')
-     * @param endDate La fecha de fin como String (ej. '31/12/2025')
      */
-    public static Specification<Renta> todayGreaterThanDate(String nameColumnInEntity) {
+    public static Specification<Event> todayGreaterThanDate(String nameColumnInEntity) {
 
         log.debug(LogConstant.GREATER_THAN_TODAY_DATE_FILTER_APPLYING);
 
@@ -118,10 +115,8 @@ public class RentaSpecification {
 
     /**
      * Filtra las Renta donde la fechaEntrega (VARCHAR) está dentro del rango.
-     * @param initDate La fecha de inicio como String (ej. '01/12/2025')
-     * @param endDate La fecha de fin como String (ej. '31/12/2025')
      */
-    public static Specification<Renta> betweenInDates(
+    public static Specification<Event> betweenInDates(
             String initFechaEntrega, String endFechaEntrega, final String nameColumnInEntity) {
 
         if (initFechaEntrega == null || endFechaEntrega == null) {

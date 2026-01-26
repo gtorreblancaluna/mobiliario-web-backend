@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Inyectar el secreto y la expiración desde application.properties
+    // Inyectar el secreto y la expiración desde application properties
     @Value("${jwt.secret}")
     private String secret;
 

@@ -1,15 +1,16 @@
 
-docker build -t gcr.io/windy-container-237418/mob-gaby-test:v2 .
+docker build -t gcr.io/windy-container-237418/mob-gaby-test:v3 .
 ----------------------------------------------------------------------
-docker push gcr.io/windy-container-237418/mob-gaby-test:v2
+docker push gcr.io/windy-container-237418/mob-gaby-test:v3
 ----------------------------------------------------------------------
 gcloud run deploy spring-java21-service \
-    --image gcr.io/windy-container-237418/mob-gaby-test:v2 \
+    --image gcr.io/windy-container-237418/mob-gaby-test:v3 \
     --platform managed \
     --region us-central1 \
     --allow-unauthenticated \
-    --set-env-vars JASYPT_ENCRYPTOR_PASSWORD=mypassword \
-    --memory 512Mi \
+    --set-env-vars="SPRING_PROFILES_ACTIVE=prod,JASYPT_ENCRYPTOR_PASSWORD=mypassword" \
+    --memory 1Gi \
+    --cpu 1 \
     --min-instances 0 \
     --timeout 900
 

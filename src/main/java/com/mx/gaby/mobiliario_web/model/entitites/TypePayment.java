@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "tipo_abono")
-public class TipoAbono {
+public class TypePayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,5 +17,8 @@ public class TipoAbono {
 
     @Column(name = "descripcion")
     private String description;
+
+    @Column(name = "fg_activo")
+    private String fgActive;
 
 }
