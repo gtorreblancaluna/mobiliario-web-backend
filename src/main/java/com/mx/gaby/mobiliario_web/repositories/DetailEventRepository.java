@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface DetailRentaRepository extends JpaRepository<DetailRenta, Integer>
+public interface DetailEventRepository extends JpaRepository<DetailRenta, Integer>
 {
 
-    List<DetailRenta> findByRentaId(Integer rentaId);
+    List<DetailRenta> findByEventId(Integer eventId);
 
 }

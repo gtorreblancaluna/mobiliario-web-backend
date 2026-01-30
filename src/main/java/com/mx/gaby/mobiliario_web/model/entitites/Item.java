@@ -1,5 +1,6 @@
 package com.mx.gaby.mobiliario_web.model.entitites;
 
+import com.mx.gaby.mobiliario_web.configs.converters.BooleanToStringConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,8 +59,9 @@ public class Item {
     @Column(name = "fecha_ultima_modificacion")
     private Timestamp updatedAt;
 
-    @Column(name = "activo")
-    private String fgActive;
+    @Column(name = "activo", nullable = false)
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean fgActive = true;
 
     @Lob
     @Column(name = "image", columnDefinition = "BLOB", nullable = true)

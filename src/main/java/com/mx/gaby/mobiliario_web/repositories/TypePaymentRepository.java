@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TypePaymentRepository extends JpaRepository<TypePayment, Integer> {
-    List<TypePayment> findAllByFgActiveOrderByDescriptionAsc(String fgActive);
+    List<TypePayment> findAllByFgActiveTrueOrderByDescriptionAsc();
 }

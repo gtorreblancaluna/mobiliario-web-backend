@@ -1,6 +1,7 @@
 package com.mx.gaby.mobiliario_web.controllers;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
+import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.records.RentaDetailDTO;
 import com.mx.gaby.mobiliario_web.records.RentaFilterDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
@@ -28,21 +29,22 @@ public class EventController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Void> save(
-            @RequestBody RentaDetailDTO rentaDetailDTO) {
+    public ResponseEntity<String> save(
+            @RequestBody RentaDetailDTO rentaDetailDTO) throws BusinessException {
 
-        log.info(LogConstant.INIT_SAVE_RENTA, rentaDetailDTO);
+        log.info(LogConstant.INIT_SAVE_EVENT, rentaDetailDTO);
 
-        rentaUpdateService.executeSaveTemplate(rentaDetailDTO);
+        String message
+                = rentaUpdateService.executeSaveTemplate(rentaDetailDTO);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping
     public ResponseEntity<List<EventDTO>> getByFilter(
             @RequestBody RentaFilterDTO rentaFilterDTO) {
 
-        log.info(LogConstant.INIT_GET_RENTA_BY_FILTER, rentaFilterDTO);
+        log.info(LogConstant.INIT_GET_EVENT_BY_FILTER, rentaFilterDTO);
 
         List<EventDTO> eventDTOList =
                 eventQueryService.getFromQuery(rentaFilterDTO);

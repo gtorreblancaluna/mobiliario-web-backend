@@ -4,27 +4,41 @@ public final class LogConstant {
 
     private LogConstant() {}
 
+    public static final String INIT_WORK_FLOW_TASK = "Iniciando flujo de tarea para evento: {}";
+    public static final String END_WORK_FLOW_TASK = "Flujo de tarea finalizado exitosamente, evento: {}";
+
+    public static final String ERROR_WHEN_GENERATE_TASK_EXECUTED
+            = "Ocurrio un error al intentar generar las tareas para el folio: {}";
+
+    public static final String MESSAGE_GENERATE_TASK_CHOFER =
+            "Tarea 'entrega chofer' generada para el chofer: {}, Folio: {}";
+
+    public static final String MESSAGE_GENERATE_TASK_ENCARGADO_ALMACEN =
+            "Tarea 'entrega chofer' generada para el encargado de almacen: {}, Folio: {}";
+
+    public static final String TASK_ALMACEN_SUCCESSFULY_CREATED =
+            "Tarea almacen creada con éxito para el usuario: {}, folio: {}";
 
     public static final String ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT
-            = "Ocurrio un error al intentar guardar los pagos del evento- Folio: {}.";
+            = "Ocurrio un error al intentar guardar los pagos del evento. Folio: {}.";
 
-    public static final String ERROR_TRYING_UPDATE_OR_SAVE_RENTA_DETAIL
+    public static final String ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL
             = "Ocurrio un error al intentar guardar el detalle del evento. Folio: {}.";
 
     public static final String PAYMENTS_UPDATED_SUCCESSFULLY
-            = "Pagos con renta folio {} actualizada con exito.";
+            = "Pagos del evento con folio {} actualizada con exito.";
 
-    public static final String RENTA_DETAIL_UPDATED_SUCCESSFULLY
-            = "Detalle renta con folio {} actualizada con exito.";
+    public static final String EVENT_DETAIL_UPDATED_SUCCESSFULLY
+            = "Detalle evento con folio {} actualizada con exito.";
 
-    public static final String RENTA_UPDATED_SUCCESSFULLY
-            = "Renta folio {} actualizada con exito.";
+    public static final String EVENT_UPDATED_SUCCESSFULLY
+            = "Evento con folio {} actualizada con exito.";
 
-    public static final String INIT_SAVE_RENTA
-            = "Iniciando guardar renta, request body: {}";
+    public static final String INIT_SAVE_EVENT
+            = "Iniciando guardar evento, request body: {}";
 
-    public static final String INIT_GET_RENTA_BY_FILTER
-            = "Iniciando rentas por filtro, request body: {}";
+    public static final String INIT_GET_EVENT_BY_FILTER
+            = "Iniciando eventos por filtro, request body: {}";
 
     public static final String INIT_AUTH
             = "Iniciando autenticacion para el usuario: {}";
@@ -43,4 +57,13 @@ public final class LogConstant {
 
     public static final String TYPE_PAYMENTS_GETTING_FROM_BD
             = ">>> ACCEDIENDO A LA DB PARA OBTENER TIPOS DE PAGO...";
+
+    public static final String WAREHOUSE_MANAGERS_GETTING_FROM_BD
+            = ">>> ACCEDIENDO A LA DB PARA OBTENER LOS ENCARGADOS DE ALMACEN...";
+
+    public static final String USERS_IN_CATEGORIES_BY_EVENT_GETTING_FROM_BD
+            = ">>> ACCEDIENDO A LA DB PARA OBTENER LOS USUARIOS POR CATEGORIA DE ALMACEN...";
+
+    public static final String CHOFERES_GETTING_FROM_BD
+            = ">>> ACCEDIENDO A LA DB PARA OBTENER LOS CHOFERES...";
 }

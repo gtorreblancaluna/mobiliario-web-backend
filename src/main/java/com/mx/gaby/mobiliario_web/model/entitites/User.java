@@ -1,5 +1,6 @@
 package com.mx.gaby.mobiliario_web.model.entitites;
 
+import com.mx.gaby.mobiliario_web.configs.converters.BooleanToStringConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,14 +27,24 @@ public class User implements UserDetails {
     private String telMovil;
     private String telFijo;
     private String direccion;
-    private String administrador;
-    private String fgEncargadoAlmacen;
+
+    @Column(name = "administrador")
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean admin;
+
+    @Column(name = "fg_encargado_almacen")
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean fgWarehouseManager;
+
     private String nivel1;
     private String nivel2;
     @Column(name = "contrasenia")
     private String password;
-    @Column(name = "activo")
-    private String fgActive;
+
+    @Column(name = "activo", nullable = false)
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean fgActive = true;
+
     @ManyToOne
     @JoinColumn(name = "id_puesto",
             nullable = false,

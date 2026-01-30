@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
         // Carga el User (que implementa UserDetails) desde JPA
-        return userRepository.findByUsernameAndFgActive(username, ApplicationConstant.ONE)
+        return userRepository.findByUsernameAndFgActiveTrue(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(MessageConstant.USER_NOT_FOUND_LOGIN));
     }

@@ -3,9 +3,12 @@ package com.mx.gaby.mobiliario_web.records;
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
 import com.mx.gaby.mobiliario_web.model.entitites.TypePayment;
+import com.mx.gaby.mobiliario_web.model.entitites.User;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
 public record PaymentDTO(
@@ -29,17 +32,24 @@ public record PaymentDTO(
         Integer paymentId = null;
         String dateString;
 
-        payment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        payment.setUpdatedAt(Timestamp.from(Instant.now()));
+        // User
+        User user = new User();
+        user.setId(paymentDTO.userId());
+        payment.setUser(user);
 
-        // is update
+        // is updated
         if (paymentDTO.id() != null && paymentDTO.id() > 0) {
             paymentId = paymentDTO.id();
             dateString = paymentDTO.date();
         } else {
-            payment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            // is created
+            payment.setCreatedAt(Timestamp.from(Instant.now()));
             dateString = new SimpleDateFormat(
                     ApplicationConstant.FORMAT_DATE_DD_MM_YYY).format(new Date());
         }
+
+        payment.setUser(user);
 
         payment.setId(paymentId);
         payment.setRentaId(rentaId);
@@ -52,6 +62,8 @@ public record PaymentDTO(
         payment.setType(typePayment);
 
         payment.setDate(dateString);
+
+
 
         return payment;
 

@@ -6,7 +6,7 @@ import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
 import com.mx.gaby.mobiliario_web.model.entitites.Event;
 import com.mx.gaby.mobiliario_web.records.*;
 import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
-import com.mx.gaby.mobiliario_web.repositories.DetailRentaRepository;
+import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
 import com.mx.gaby.mobiliario_web.repositories.EventRepository;
 import com.mx.gaby.mobiliario_web.repositories.specification.RentaSpecification;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,12 +18,12 @@ import java.util.List;
 public class EventQueryServiceImpl implements EventQueryService {
 
     private final EventRepository eventRepository;
-    private final DetailRentaRepository detailRentaRepository;
+    private final DetailEventRepository detailEventRepository;
     private final PaymentRepository paymentRepository;
 
-    public EventQueryServiceImpl(EventRepository eventRepository, DetailRentaRepository detailRentaRepository, PaymentRepository paymentRepository) {
+    public EventQueryServiceImpl(EventRepository eventRepository, DetailEventRepository detailEventRepository, PaymentRepository paymentRepository) {
         this.eventRepository = eventRepository;
-        this.detailRentaRepository = detailRentaRepository;
+        this.detailEventRepository = detailEventRepository;
         this.paymentRepository = paymentRepository;
     }
 
@@ -35,7 +35,7 @@ public class EventQueryServiceImpl implements EventQueryService {
                         new NotFoundException("Renta con ID " + id + " no encontrada."));
 
         List<DetailRenta> detailEntities
-                = detailRentaRepository.findByRentaId(eventEntity.getId());
+                = detailEventRepository.findByEventId(eventEntity.getId());
 
         List<Payment> abonosEntities =
                 paymentRepository.findByRentaId(eventEntity.getId());

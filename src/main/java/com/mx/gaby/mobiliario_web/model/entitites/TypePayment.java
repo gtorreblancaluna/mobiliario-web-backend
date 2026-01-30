@@ -1,5 +1,6 @@
 package com.mx.gaby.mobiliario_web.model.entitites;
 
+import com.mx.gaby.mobiliario_web.configs.converters.BooleanToStringConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,9 @@ public class TypePayment {
     @Column(name = "descripcion")
     private String description;
 
-    @Column(name = "fg_activo")
-    private String fgActive;
+    @Column(name = "fg_activo", nullable = false,
+            columnDefinition = "ENUM('1','0') DEFAULT '1'")
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean fgActive = true;
 
 }

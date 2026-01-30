@@ -27,7 +27,7 @@ public class TypePaymentServiceImpl implements TypePaymentService{
     public List<TypePaymentDTO> getAll() {
         log.info(LogConstant.TYPE_PAYMENTS_GETTING_FROM_BD);
         return typePaymentRepository
-                .findAllByFgActiveOrderByDescriptionAsc(ApplicationConstant.FG_ACTIVE_TRUE)
+                .findAllByFgActiveTrueOrderByDescriptionAsc()
                 .stream()
                 .map(TypePaymentDTO::fromEntity)
                 .toList();

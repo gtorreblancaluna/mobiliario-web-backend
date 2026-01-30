@@ -6,11 +6,11 @@ import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
-import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
-import com.mx.gaby.mobiliario_web.records.PaymentDTO;
-import com.mx.gaby.mobiliario_web.records.RentaDetailDTO;
-import com.mx.gaby.mobiliario_web.repositories.DetailRentaRepository;
+import com.mx.gaby.mobiliario_web.records.*;
+import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
+import com.mx.gaby.mobiliario_web.repositories.EventRepository;
 import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
+import com.mx.gaby.mobiliario_web.repositories.UserRepository;
 import com.mx.gaby.mobiliario_web.utils.ValidateUtil;
 import lombok.extern.log4j.Log4j2;
 
@@ -20,15 +20,27 @@ import java.util.List;
 @Log4j2
 public abstract class EventService {
 
-    protected final DetailRentaRepository detailRentaRepository;
+    protected final EventRepository eventRepository;
+    protected final DetailEventRepository detailEventRepository;
     protected final PaymentRepository paymentRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final MessageStorageService messageStorageService;
 
-    protected EventService(DetailRentaRepository detailRentaRepository, PaymentRepository paymentRepository) {
-        this.detailRentaRepository = detailRentaRepository;
+    protected EventService(
+            EventRepository eventRepository, DetailEventRepository detailEventRepository,
+            PaymentRepository paymentRepository,
+            UserService userService,
+            UserRepository userRepository, MessageStorageService messageStorageService) {
+        this.eventRepository = eventRepository;
+        this.detailEventRepository = detailEventRepository;
         this.paymentRepository = paymentRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.messageStorageService = messageStorageService;
     }
 
-    protected void savePayments (final RentaDetailDTO rentaDetailDTO)
+    private void savePayments (final RentaDetailDTO rentaDetailDTO)
             throws BusinessException {
 
         if (rentaDetailDTO.payments().isEmpty()) {
@@ -37,11 +49,21 @@ public abstract class EventService {
 
         try {
 
+            UserDTO userSession = userService.getAuthenticatedUser();
+
             List<Payment> payments = rentaDetailDTO
                     .payments()
                     .stream()
                     .map(dto -> PaymentDTO.fromDTO(dto, rentaDetailDTO.event().id()))
                     .toList();
+
+            // identificar nuevos pagos y asignarle al usuario que esta en sesion.
+            payments.forEach(payment -> {
+                if (payment.getId() == null || payment.getId().equals(0)) {
+                    // para evitar el error de "Unsaved transient entity"
+                    payment.setUser(userRepository.getReferenceById(userSession.id()));
+                }
+            });
 
             paymentRepository.saveAll(payments);
 
@@ -58,7 +80,7 @@ public abstract class EventService {
         }
     }
 
-    protected void saveDetails (final RentaDetailDTO rentaDetailDTO)
+    private void saveDetails (final RentaDetailDTO rentaDetailDTO)
             throws BusinessException {
 
         try {
@@ -71,15 +93,15 @@ public abstract class EventService {
                     )
                     .toList();
 
-            detailRentaRepository.saveAll(detailRentaList);
+            detailEventRepository.saveAll(detailRentaList);
 
-            log.info(LogConstant.RENTA_DETAIL_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio());
+            log.info(LogConstant.EVENT_DETAIL_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio());
 
         } catch (Exception exception) {
-            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_RENTA_DETAIL, rentaDetailDTO.event().folio());
+            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, rentaDetailDTO.event().folio());
             throw new BusinessException(
                     MessageFormat.format(
-                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_RENTA_DETAIL,rentaDetailDTO.event()
+                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL,rentaDetailDTO.event()
                                     .folio()),exception);
         }
     }
@@ -119,8 +141,7 @@ public abstract class EventService {
         }
     }
 
-    private void validate (final RentaDetailDTO rentaDetailDTO)
-            throws BusinessException {
+    private void validate (final RentaDetailDTO rentaDetailDTO) {
 
         validateStatusAndTypeEvent(rentaDetailDTO.event().estadoId().toString(),
                 rentaDetailDTO.event().tipoId().toString());
@@ -196,15 +217,27 @@ public abstract class EventService {
 
     }
 
-    abstract void save (final RentaDetailDTO rentaDetailDTO)
-            throws BusinessException;
+    protected abstract String save (final RentaDetailDTO rentaDetailDTO);
+
+    protected abstract String generateTasks(
+            final RentaDetailDTO rentaDetailDTO, EventDTO currentEventDTO) throws BusinessException;
 
     // template method
-    public void executeSaveTemplate (final RentaDetailDTO rentaDetailDTO)
-            throws BusinessException {
+    public String executeSaveTemplate (
+            final RentaDetailDTO rentaDetailDTO)
+                throws BusinessException {
 
         validate(rentaDetailDTO);
         // method 'save' will execute in child class.
-        save(rentaDetailDTO);
+        String messageSaved = save(rentaDetailDTO);
+
+        messageStorageService.addMessage(messageSaved);
+
+        saveDetails(rentaDetailDTO);
+
+        savePayments(rentaDetailDTO);
+
+        return messageSaved;
     }
+
 }

@@ -19,7 +19,7 @@ public class DetailRenta {
     private Float amount;
 
     @Column(name = "id_renta")
-    private Integer rentaId;
+    private Integer eventId;
 
     @ManyToOne
     @JoinColumn(name = "id_articulo",

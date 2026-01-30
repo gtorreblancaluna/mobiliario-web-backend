@@ -18,7 +18,7 @@ public record DetailRentaDTO(
         Float subtotal    // Calculado: (cantidad * precio) - descuento
 ) {
 
-    public static DetailRenta fromDTO (DetailRentaDTO detailRentaDTO, Integer rentaId) {
+    public static DetailRenta fromDTO (DetailRentaDTO detailRentaDTO, Integer eventId) {
 
         DetailRenta detailRenta = new DetailRenta();
 
@@ -31,7 +31,7 @@ public record DetailRentaDTO(
 
         detailRenta.setId(detailId);
         detailRenta.setAmount(detailRentaDTO.amount());
-        detailRenta.setRentaId(rentaId);
+        detailRenta.setEventId(eventId);
 
         Item item = new Item();
         item.setId(detailRentaDTO.itemId());

@@ -4,6 +4,12 @@ public final class ValidationMessageConstant {
 
     private ValidationMessageConstant() {}
 
+    public static final String NO_GENERATE_TASK_USERS_IN_CATEGORIES_NOT_FOUND =
+            "No se generó tarea de almacén, por que no se obtuvieron usuarios por categoria para el folio: {0}";
+
+    public static final String ERROR_EVENT_NOT_FOUND_WHEN_TRYING_GENERATE_TASK =
+            "No se pudo obtener el evento al intentar generar la tarea a almacen.";
+
     // En ValidationMessageConstant.java
     public static final String ERROR_COTIZACION_STATUS =
             "Evento tipo {0} debe tener estado {1}";

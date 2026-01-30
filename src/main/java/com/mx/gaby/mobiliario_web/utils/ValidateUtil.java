@@ -14,7 +14,8 @@ public final class ValidateUtil {
 
     private ValidateUtil () {}
 
-    public static void isValidRange(final String timeRange) {
+    public static void isValidRange(final String timeRange)
+        throws BusinessException{
 
         if (timeRange == null || !timeRange.contains(ValidationMessageConstant.REGEX_A)) {
             throw new BusinessException(ValidationMessageConstant.HOURS_REQUIRED);
@@ -44,7 +45,7 @@ public final class ValidateUtil {
     }
 
     public static void validateInitAndEndDate
-            (final String initDate, final String endDate) {
+            (final String initDate, final String endDate) throws BusinessException{
 
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern(ApplicationConstant.FORMAT_DATE_DD_MM_YYY);

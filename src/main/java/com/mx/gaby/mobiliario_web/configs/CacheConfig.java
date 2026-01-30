@@ -21,7 +21,10 @@ public class CacheConfig {
         cacheManager.setCacheNames(
                 List.of(
                         CacheConstant.ITEMS_CACHE_KEY,
-                        CacheConstant.TYPE_PAYMENTS_CACHE_KEY));
+                        CacheConstant.TYPE_PAYMENTS_CACHE_KEY,
+                        CacheConstant.WAREHOUSE_MANAGERS_CACHE_KEY,
+                        CacheConstant.CHOFERES_CACHE_KEY,
+                        CacheConstant.USERS_IN_CATEGORIES_BY_EVENT_CACHE_KEY));
 
         // Aplicamos la política de Caffeine
         cacheManager.setCaffeine(Caffeine.newBuilder()
