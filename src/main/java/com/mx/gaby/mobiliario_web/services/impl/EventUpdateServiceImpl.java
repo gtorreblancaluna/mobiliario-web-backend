@@ -1,4 +1,4 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
@@ -12,6 +12,9 @@ import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
 import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
 import com.mx.gaby.mobiliario_web.repositories.EventRepository;
 import com.mx.gaby.mobiliario_web.repositories.UserRepository;
+import com.mx.gaby.mobiliario_web.services.EventService;
+import com.mx.gaby.mobiliario_web.services.MessageStorageService;
+import com.mx.gaby.mobiliario_web.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -28,8 +31,8 @@ import java.util.concurrent.CompletableFuture;
 @Transactional
 public class EventUpdateServiceImpl extends EventService {
 
-    private final TaskAlmacenUpdateServiceImpl taskAlmacenUpdateService;
-    private final TaskAlmacenChoferUpdateServiceImpl taskAlmacenChoferUpdateService;
+    private final TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService;
+    private final TaskWarehouseChoferUpdateServiceImpl taskDriverManUpdateService;
     private final TaskWarehouseManagerUpdateServiceImpl taskWarehouseManagerUpdateService;
     private final MessageStorageService messageStorageService;
 
@@ -37,8 +40,8 @@ public class EventUpdateServiceImpl extends EventService {
 
             DetailEventRepository detailEventRepository,
             PaymentRepository paymentRepository,
-            TaskAlmacenUpdateServiceImpl taskAlmacenUpdateService,
-            TaskAlmacenChoferUpdateServiceImpl taskAlmacenChoferUpdateService,
+            TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService,
+            TaskWarehouseChoferUpdateServiceImpl taskDriverManUpdateService,
             UserService userService,
             UserRepository userRepository,
             EventRepository eventRepository,
@@ -48,8 +51,8 @@ public class EventUpdateServiceImpl extends EventService {
         super(eventRepository,
                 detailEventRepository,
                 paymentRepository, userService, userRepository); // El padre recibe su dependencia
-        this.taskAlmacenUpdateService = taskAlmacenUpdateService;
-        this.taskAlmacenChoferUpdateService = taskAlmacenChoferUpdateService;
+        this.taskWarehouseUpdateService = taskWarehouseUpdateService;
+        this.taskDriverManUpdateService = taskDriverManUpdateService;
         this.taskWarehouseManagerUpdateService = taskWarehouseManagerUpdateService;
         this.messageStorageService = messageStorageService;
     }
@@ -73,9 +76,12 @@ public class EventUpdateServiceImpl extends EventService {
         eventToUpdateEntity.setUpdatedAt(Timestamp.from(Instant.now()));
         eventRepository.updateEvent(eventToUpdateEntity);
 
+        UserDTO userSession = userService.getAuthenticatedUser();
+
         String logMessage =
                 MessageFormat.format(
-                        LogConstant.EVENT_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio());
+                        LogConstant.EVENT_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio(),
+                        userSession.fullName());
 
         log.info(logMessage);
 
@@ -104,12 +110,11 @@ public class EventUpdateServiceImpl extends EventService {
 
         EventDTO eventToUpdate = rentaDetailDTO.event();
         List<DetailRentaDTO> detailToUpdate = rentaDetailDTO.detail();
-
         UserDTO userSession = userService.getAuthenticatedUser();
 
-        CompletableFuture<Void> taskAlmacen = CompletableFuture.runAsync(() -> {
+        CompletableFuture<Void> taskWarehouse = CompletableFuture.runAsync(() -> {
             try {
-                taskAlmacenUpdateService
+                taskWarehouseUpdateService
                         .executeTaskWorkflow(
                                 currentEventDTO,
                                 eventToUpdate,
@@ -120,10 +125,10 @@ public class EventUpdateServiceImpl extends EventService {
             }
         });
 
-        CompletableFuture<Void> taskChofer
+        CompletableFuture<Void> taskDriverMan
                 = CompletableFuture.runAsync(() -> {
             try {
-                taskAlmacenChoferUpdateService
+                taskDriverManUpdateService
                         .executeTaskWorkflow(
                                 currentEventDTO,
                                 eventToUpdate,
@@ -148,7 +153,7 @@ public class EventUpdateServiceImpl extends EventService {
             }
         });
 
-        CompletableFuture.allOf(taskAlmacen, taskChofer, taskWarehouseManager)
+        CompletableFuture.allOf(taskWarehouse, taskDriverMan, taskWarehouseManager)
                 .thenRun(() -> messageStorageService.addMessage(
                         LogConstant.MSG_ALL_WORKFLOWS_PROCESSED));
 

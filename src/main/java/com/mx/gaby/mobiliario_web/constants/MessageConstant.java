@@ -4,16 +4,6 @@ public final class MessageConstant {
 
     private MessageConstant() {}
 
-    public static final String TASK_FOR_WAREHOUSE_MANAGER = "Logs generados" +
-            " para las tareas creadas a los encargados de almacen.";
-
-    public static final String TASK_FOR_CHOFER = "Logs generados" +
-            " para las tareas creadas a los choferes.";
-
-    public static final String TASK_FOR_USERS = "Logs generados" +
-            " para las tareas creadas a los usuarios por categoria.";
-
-
     public static final String USER_NOT_FOUND_LOGIN
             = "Credenciales inválidas o usuario no encontrado.";
 

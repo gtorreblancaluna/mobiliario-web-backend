@@ -1,4 +1,4 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.exceptions.NotFoundException;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
@@ -9,6 +9,7 @@ import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
 import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
 import com.mx.gaby.mobiliario_web.repositories.EventRepository;
 import com.mx.gaby.mobiliario_web.repositories.specification.RentaSpecification;
+import com.mx.gaby.mobiliario_web.services.EventQueryService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 

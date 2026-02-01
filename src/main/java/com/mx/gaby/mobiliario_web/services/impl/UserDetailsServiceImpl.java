@@ -1,6 +1,5 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
-import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -6,7 +6,7 @@ import com.mx.gaby.mobiliario_web.records.RentaDetailDTO;
 import com.mx.gaby.mobiliario_web.records.RentaFilterDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.services.EventQueryService;
-import com.mx.gaby.mobiliario_web.services.EventUpdateServiceImpl;
+import com.mx.gaby.mobiliario_web.services.impl.EventUpdateServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

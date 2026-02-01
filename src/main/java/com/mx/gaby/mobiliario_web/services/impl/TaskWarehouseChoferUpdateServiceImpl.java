@@ -1,4 +1,4 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
@@ -7,6 +7,8 @@ import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
 import com.mx.gaby.mobiliario_web.repositories.ChoferDeliveryTaskRepository;
+import com.mx.gaby.mobiliario_web.services.MessageStorageService;
+import com.mx.gaby.mobiliario_web.services.TaskWarehouseService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +17,12 @@ import java.util.List;
 
 @Service
 @Log4j2
-public class TaskAlmacenChoferUpdateServiceImpl extends TaskAlmacenService{
+public class TaskWarehouseChoferUpdateServiceImpl extends TaskWarehouseService {
 
     private final MessageStorageService messageStorageService;
     private final ChoferDeliveryTaskRepository choferDeliveryTaskRepository;
 
-    public TaskAlmacenChoferUpdateServiceImpl(
+    public TaskWarehouseChoferUpdateServiceImpl(
             MessageStorageService messageStorageService, ChoferDeliveryTaskRepository choferDeliveryTaskRepository) {
         this.messageStorageService = messageStorageService;
         this.choferDeliveryTaskRepository = choferDeliveryTaskRepository;

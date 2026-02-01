@@ -1,4 +1,4 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.CacheConstant;
@@ -7,6 +7,7 @@ import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.User;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
 import com.mx.gaby.mobiliario_web.repositories.UserRepository;
+import com.mx.gaby.mobiliario_web.services.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @Service
 @Log4j2
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 

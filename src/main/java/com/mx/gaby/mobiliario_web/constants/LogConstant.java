@@ -34,7 +34,7 @@ public final class LogConstant {
             = "Detalle evento con folio {} actualizada con exito.";
 
     public static final String EVENT_UPDATED_SUCCESSFULLY
-            = "Folio: {1,number,#} -> Evento actualizado con éxito.";
+            = "Folio: {0,number,#} -> Evento actualizado con éxito, por el usuario: {1}";
 
     public static final String INIT_SAVE_EVENT
             = "Iniciando guardar evento, request body: {}";

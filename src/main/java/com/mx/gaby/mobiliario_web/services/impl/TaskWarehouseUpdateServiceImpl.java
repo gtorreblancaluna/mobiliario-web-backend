@@ -1,4 +1,4 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
@@ -8,6 +8,9 @@ import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
 import com.mx.gaby.mobiliario_web.repositories.AlmacenTaskRepository;
+import com.mx.gaby.mobiliario_web.services.MessageStorageService;
+import com.mx.gaby.mobiliario_web.services.TaskWarehouseService;
+import com.mx.gaby.mobiliario_web.services.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +20,13 @@ import java.util.List;
 
 @Service
 @Log4j2
-public class TaskAlmacenUpdateServiceImpl extends TaskAlmacenService{
+public class TaskWarehouseUpdateServiceImpl extends TaskWarehouseService {
 
     private final AlmacenTaskRepository almacenTaskRepository;
     private final UserService userService;
     private final MessageStorageService messageStorageService;
 
-    public TaskAlmacenUpdateServiceImpl(AlmacenTaskRepository almacenTaskRepository, UserService userService, MessageStorageService messageStorageService) {
+    public TaskWarehouseUpdateServiceImpl(AlmacenTaskRepository almacenTaskRepository, UserService userService, MessageStorageService messageStorageService) {
         this.almacenTaskRepository = almacenTaskRepository;
         this.userService = userService;
         this.messageStorageService = messageStorageService;

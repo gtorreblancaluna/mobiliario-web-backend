@@ -1,6 +1,6 @@
 package com.mx.gaby.mobiliario_web.configs;
 
-import com.mx.gaby.mobiliario_web.services.UserDetailsServiceImpl;
+import com.mx.gaby.mobiliario_web.services.impl.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

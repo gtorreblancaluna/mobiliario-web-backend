@@ -13,9 +13,8 @@ import java.util.List;
 @Service
 public class MessageStorageService {
 
-    // Guardamos los últimos 100 mensajes para no saturar la RAM
     private final List<String> messageLog = Collections.synchronizedList(new LinkedList<>());
-    private static final int MAX_MESSAGES = 100;
+    private static final int MAX_MESSAGES = 600;
 
     public void addMessage(String msg) {
         if (messageLog.size() >= MAX_MESSAGES) {

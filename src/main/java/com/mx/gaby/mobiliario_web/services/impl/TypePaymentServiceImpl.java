@@ -1,11 +1,10 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
-import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.CacheConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
-import com.mx.gaby.mobiliario_web.model.entitites.TypePayment;
 import com.mx.gaby.mobiliario_web.records.TypePaymentDTO;
 import com.mx.gaby.mobiliario_web.repositories.TypePaymentRepository;
+import com.mx.gaby.mobiliario_web.services.TypePaymentService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Service
 @Log4j2
-public class TypePaymentServiceImpl implements TypePaymentService{
+public class TypePaymentServiceImpl implements TypePaymentService {
 
     private final TypePaymentRepository typePaymentRepository;
 

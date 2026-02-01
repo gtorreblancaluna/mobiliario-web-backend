@@ -1,6 +1,6 @@
 package com.mx.gaby.mobiliario_web.filters;
 
-import com.mx.gaby.mobiliario_web.services.UserDetailsServiceImpl;
+import com.mx.gaby.mobiliario_web.services.impl.UserDetailsServiceImpl;
 import com.mx.gaby.mobiliario_web.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

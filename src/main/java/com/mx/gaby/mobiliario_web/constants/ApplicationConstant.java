@@ -45,7 +45,6 @@ public final class ApplicationConstant {
     public static final String ONE = "1";
     public static final String BLANK_SPACE = " ";
     public static final String BREAK_LINE_HTML = "\n";
-    public static final String LINE_HTML = "####################################";
 
     public static final String EMPTY_STRING = "";
 

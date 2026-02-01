@@ -7,7 +7,7 @@ import com.mx.gaby.mobiliario_web.model.entitites.User;
 import com.mx.gaby.mobiliario_web.model.responses.AuthenticationResponse;
 import com.mx.gaby.mobiliario_web.model.responses.UserDataResponse;
 import com.mx.gaby.mobiliario_web.records.AuthenticationRequestDTO;
-import com.mx.gaby.mobiliario_web.services.UserDetailsServiceImpl;
+import com.mx.gaby.mobiliario_web.services.impl.UserDetailsServiceImpl;
 import com.mx.gaby.mobiliario_web.utils.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -31,9 +31,10 @@ public class AuthController {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil,
-                          UserDetailsServiceImpl userDetailsService) {
+    public AuthController(
+          AuthenticationManager authenticationManager,
+          JwtUtil jwtUtil,
+          UserDetailsServiceImpl userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;

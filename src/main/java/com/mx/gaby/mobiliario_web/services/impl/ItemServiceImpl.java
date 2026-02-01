@@ -1,11 +1,11 @@
-package com.mx.gaby.mobiliario_web.services;
+package com.mx.gaby.mobiliario_web.services.impl;
 
-import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.CacheConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.records.ItemDTO;
 import com.mx.gaby.mobiliario_web.repositories.ItemRepository;
 
+import com.mx.gaby.mobiliario_web.services.ItemService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

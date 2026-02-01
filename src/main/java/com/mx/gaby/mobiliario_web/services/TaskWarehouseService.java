@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Log4j2
-public abstract class TaskAlmacenService {
+public abstract class TaskWarehouseService {
 
     protected boolean checkIfItemsHasBeenUpdated(
             final List<DetailRentaDTO> detailToUpdate,
