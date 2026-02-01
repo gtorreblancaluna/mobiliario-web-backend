@@ -23,21 +23,20 @@ public abstract class EventService {
     protected final EventRepository eventRepository;
     protected final DetailEventRepository detailEventRepository;
     protected final PaymentRepository paymentRepository;
-    private final UserService userService;
+    protected final UserService userService;
     private final UserRepository userRepository;
-    private final MessageStorageService messageStorageService;
 
     protected EventService(
             EventRepository eventRepository, DetailEventRepository detailEventRepository,
             PaymentRepository paymentRepository,
             UserService userService,
-            UserRepository userRepository, MessageStorageService messageStorageService) {
+            UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.detailEventRepository = detailEventRepository;
         this.paymentRepository = paymentRepository;
         this.userService = userService;
         this.userRepository = userRepository;
-        this.messageStorageService = messageStorageService;
+
     }
 
     private void savePayments (final RentaDetailDTO rentaDetailDTO)
@@ -217,27 +216,24 @@ public abstract class EventService {
 
     }
 
-    protected abstract String save (final RentaDetailDTO rentaDetailDTO);
+    protected abstract void save (final RentaDetailDTO rentaDetailDTO);
 
-    protected abstract String generateTasks(
+    protected abstract void generateTasks(
             final RentaDetailDTO rentaDetailDTO, EventDTO currentEventDTO) throws BusinessException;
 
     // template method
-    public String executeSaveTemplate (
+    public void executeSaveTemplate (
             final RentaDetailDTO rentaDetailDTO)
                 throws BusinessException {
 
         validate(rentaDetailDTO);
         // method 'save' will execute in child class.
-        String messageSaved = save(rentaDetailDTO);
-
-        messageStorageService.addMessage(messageSaved);
+        save(rentaDetailDTO);
 
         saveDetails(rentaDetailDTO);
 
         savePayments(rentaDetailDTO);
 
-        return messageSaved;
     }
 
 }

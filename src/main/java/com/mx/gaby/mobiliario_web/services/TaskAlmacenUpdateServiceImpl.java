@@ -1,8 +1,6 @@
 package com.mx.gaby.mobiliario_web.services;
 
-import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
-import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.*;
@@ -23,10 +21,12 @@ public class TaskAlmacenUpdateServiceImpl extends TaskAlmacenService{
 
     private final AlmacenTaskRepository almacenTaskRepository;
     private final UserService userService;
+    private final MessageStorageService messageStorageService;
 
-    public TaskAlmacenUpdateServiceImpl(AlmacenTaskRepository almacenTaskRepository, UserService userService) {
+    public TaskAlmacenUpdateServiceImpl(AlmacenTaskRepository almacenTaskRepository, UserService userService, MessageStorageService messageStorageService) {
         this.almacenTaskRepository = almacenTaskRepository;
         this.userService = userService;
+        this.messageStorageService = messageStorageService;
     }
 
     private void validateUsers(List<UserDTO> users, Integer folio)
@@ -37,37 +37,35 @@ public class TaskAlmacenUpdateServiceImpl extends TaskAlmacenService{
         }
     }
 
-    private String saveTasksForUsers (
+    private void saveTasksForUsers (
             List<UserDTO> usersInCategories,
             final EventDTO currentEvent,
-            StatusTask statusTask) {
-
-        StringBuilder sb = new StringBuilder();
+            StatusTask statusTask,
+            final UserDTO userSession) {
 
         for (UserDTO userDTO : usersInCategories) {
             AlmacenTask almacenTask = getAlmacenTask(currentEvent, statusTask,userDTO);
+
+            almacenTask.setCreatedBy(userSession.id());
+
             almacenTaskRepository.save(almacenTask);
 
-            sb.append(
-                    MessageFormat.format(
-                            MessageConstant.TASK_ALMACEN_SUCCESSFULY_CREATED
-                            ,userDTO.name()));
+           String logMessage = MessageFormat.format(
+                   LogConstant.TASK_ALMACEN_SUCCESSFULY_CREATED,userDTO.name(),currentEvent.folio());
 
-            sb.append(ApplicationConstant.BREAK_LINE_HTML);
-
-            log.info(
-                    LogConstant.TASK_ALMACEN_SUCCESSFULY_CREATED,userDTO.name(),currentEvent.folio());
+            messageStorageService.addMessage(logMessage);
+            log.info(logMessage);
         }
 
-        return sb.toString();
     }
 
     @Override
-    protected String process(
+    protected void process(
             final EventDTO currentEvent,
             final EventDTO eventToUpdate,
             final List<DetailRentaDTO> detailToUpdate,
-            final List<DetailRentaDTO> currentDetail
+            final List<DetailRentaDTO> currentDetail,
+            final UserDTO userSession
             ) throws BusinessException {
 
         // 1. Obtención de responsables (Lógica específica)
@@ -80,15 +78,7 @@ public class TaskAlmacenUpdateServiceImpl extends TaskAlmacenService{
         StatusTask statusTask = applyRulesAndGetStatus (
                 currentEvent,eventToUpdate,detailToUpdate,currentDetail);
 
-
-        return ApplicationConstant.LINE_HTML +
-                ApplicationConstant.BREAK_LINE_HTML +
-                    MessageConstant.TASK_FOR_USERS +
-                    ApplicationConstant.BREAK_LINE_HTML +
-                    ApplicationConstant.LINE_HTML +
-                    ApplicationConstant.BREAK_LINE_HTML +
-                    // 3. Persistencia
-                    saveTasksForUsers(usersInCategories, currentEvent, statusTask);
+       saveTasksForUsers(usersInCategories, currentEvent, statusTask, userSession);
 
     }
 

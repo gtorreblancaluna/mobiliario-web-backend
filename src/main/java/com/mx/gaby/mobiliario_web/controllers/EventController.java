@@ -29,15 +29,14 @@ public class EventController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(
+    public ResponseEntity<Void> save(
             @RequestBody RentaDetailDTO rentaDetailDTO) throws BusinessException {
 
         log.info(LogConstant.INIT_SAVE_EVENT, rentaDetailDTO);
 
-        String message
-                = rentaUpdateService.executeSaveTemplate(rentaDetailDTO);
+        rentaUpdateService.executeSaveTemplate(rentaDetailDTO);
 
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping

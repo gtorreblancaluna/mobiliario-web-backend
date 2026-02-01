@@ -4,6 +4,8 @@ public final class LogConstant {
 
     private LogConstant() {}
 
+    public static final String MSG_ALL_WORKFLOWS_PROCESSED = "✅ Todos los workflows de almacén procesados.";
+
     public static final String INIT_WORK_FLOW_TASK = "Iniciando flujo de tarea para evento: {}";
     public static final String END_WORK_FLOW_TASK = "Flujo de tarea finalizado exitosamente, evento: {}";
 
@@ -11,13 +13,13 @@ public final class LogConstant {
             = "Ocurrio un error al intentar generar las tareas para el folio: {}";
 
     public static final String MESSAGE_GENERATE_TASK_CHOFER =
-            "Tarea 'entrega chofer' generada para el chofer: {}, Folio: {}";
+            "Folio: {1,number,#} -> Tarea 'entrega chofer' generada para el chofer: {0}.";
 
-    public static final String MESSAGE_GENERATE_TASK_ENCARGADO_ALMACEN =
-            "Tarea 'entrega chofer' generada para el encargado de almacen: {}, Folio: {}";
+    public static final String MESSAGE_GENERATE_TASK_WAREHGOUSE_MANAGER =
+            "Folio: {1,number,#} -> Tarea 'encargado de almacen' generada para el usuario: {0}.";
 
     public static final String TASK_ALMACEN_SUCCESSFULY_CREATED =
-            "Tarea almacen creada con éxito para el usuario: {}, folio: {}";
+            "Folio: {1,number,#} -> Tarea almacen creada con éxito para el usuario: {0}.";
 
     public static final String ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT
             = "Ocurrio un error al intentar guardar los pagos del evento. Folio: {}.";
@@ -32,7 +34,7 @@ public final class LogConstant {
             = "Detalle evento con folio {} actualizada con exito.";
 
     public static final String EVENT_UPDATED_SUCCESSFULLY
-            = "Evento con folio {} actualizada con exito.";
+            = "Folio: {1,number,#} -> Evento actualizado con éxito.";
 
     public static final String INIT_SAVE_EVENT
             = "Iniciando guardar evento, request body: {}";

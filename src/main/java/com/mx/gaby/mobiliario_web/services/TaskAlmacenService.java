@@ -3,8 +3,10 @@ package com.mx.gaby.mobiliario_web.services;
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
+import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
+import com.mx.gaby.mobiliario_web.records.UserDTO;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import java.util.List;
@@ -42,6 +44,35 @@ public abstract class TaskAlmacenService {
             // Si no existe el ID o la cantidad es diferente, entonces se actualizó (true)
             return newAmount == null || !newAmount.equals(actual.amount());
         });
+    }
+
+    protected ChoferDeliveryTask getChoferDeliveryTask (
+            EventDTO eventToUpdate,StatusTask statusTask, Integer choferId) {
+
+        ChoferDeliveryTask choferDeliveryTask = new ChoferDeliveryTask();
+
+        // Event
+        Event event = new Event();
+        event.setId(eventToUpdate.id());
+        choferDeliveryTask.setEvent(event);
+
+        // status
+        AlmacenTaskStatus almacenTaskStatus = new AlmacenTaskStatus();
+        almacenTaskStatus.setId(statusTask.getId());
+        choferDeliveryTask.setStatus(almacenTaskStatus);
+
+        //type
+        AttendAlmacenTaskType attendAlmacenTaskType = new AttendAlmacenTaskType();
+        attendAlmacenTaskType.setId(1);
+        choferDeliveryTask.setType(attendAlmacenTaskType);
+
+        User chofer = new User();
+        chofer.setId(choferId);
+        choferDeliveryTask.setChofer(chofer);
+
+        chofer.setFgActive(true);
+
+        return choferDeliveryTask;
     }
 
     protected boolean checkIfGeneralDataHasBeenUpdated(
@@ -175,29 +206,30 @@ public abstract class TaskAlmacenService {
     }
 
     // Único punto de entrada permitido para el exterior
-    public final String executeTaskWorkflow(
+    public final void executeTaskWorkflow(
             EventDTO currentEvent,
             EventDTO eventToUpdate,
             List<DetailRentaDTO> detailToUpdate,
-            List<DetailRentaDTO> currentDetail) throws BusinessException {
+            List<DetailRentaDTO> currentDetail,
+            UserDTO userSession) throws BusinessException {
 
         // 1. Logs o pre-validaciones globales (Dry Run)
         log.info(LogConstant.INIT_WORK_FLOW_TASK, currentEvent.folio());
 
         // 2. Llamada al método protegido que solo las hijas conocen
-        String messageSuccessfully
-                = process(currentEvent, eventToUpdate, detailToUpdate, currentDetail);
+       process(currentEvent, eventToUpdate, detailToUpdate,
+               currentDetail, userSession);
 
         // 3. Post-procesamiento o auditoría global
         log.info(LogConstant.END_WORK_FLOW_TASK, currentEvent.folio());
 
-        return messageSuccessfully;
     }
 
-    protected abstract String process (
+    protected abstract void process (
             final EventDTO currentEvent,
             final EventDTO eventToUpdate,
             final List<DetailRentaDTO> detailToUpdate,
-            final List<DetailRentaDTO> currentDetail) throws BusinessException;
+            final List<DetailRentaDTO> currentDetail,
+            UserDTO userSession) throws BusinessException;
 
 }
