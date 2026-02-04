@@ -26,7 +26,10 @@ public class TaskWarehouseUpdateServiceImpl extends TaskWarehouseService {
     private final UserService userService;
     private final MessageStorageService messageStorageService;
 
-    public TaskWarehouseUpdateServiceImpl(AlmacenTaskRepository almacenTaskRepository, UserService userService, MessageStorageService messageStorageService) {
+    public TaskWarehouseUpdateServiceImpl(
+            AlmacenTaskRepository almacenTaskRepository,
+            UserService userService, MessageStorageService messageStorageService) {
+        super(messageStorageService);
         this.almacenTaskRepository = almacenTaskRepository;
         this.userService = userService;
         this.messageStorageService = messageStorageService;
@@ -47,11 +50,11 @@ public class TaskWarehouseUpdateServiceImpl extends TaskWarehouseService {
             final UserDTO userSession) {
 
         for (UserDTO userDTO : usersInCategories) {
-            AlmacenTask almacenTask = getAlmacenTask(currentEvent, statusTask,userDTO);
+            WarehouseTask warehouseTask = getAlmacenTask(currentEvent, statusTask,userDTO);
 
-            almacenTask.setCreatedBy(userSession.id());
+            warehouseTask.setCreatedBy(userSession.id());
 
-            almacenTaskRepository.save(almacenTask);
+            almacenTaskRepository.save(warehouseTask);
 
            String logMessage = MessageFormat.format(
                    LogConstant.TASK_ALMACEN_SUCCESSFULY_CREATED,userDTO.name(),currentEvent.folio());
@@ -73,7 +76,7 @@ public class TaskWarehouseUpdateServiceImpl extends TaskWarehouseService {
 
         // 1. Obtención de responsables (Lógica específica)
         List<UserDTO> usersInCategories =
-                userService.getUsersInCategoriesAlmacenAndEvent(currentEvent.id());
+                userService.getUsersInCategoriesWarehouseAndEvent(currentEvent.id());
 
         validateUsers(usersInCategories, currentEvent.folio());
 
@@ -85,34 +88,34 @@ public class TaskWarehouseUpdateServiceImpl extends TaskWarehouseService {
 
     }
 
-    private static AlmacenTask getAlmacenTask(
+    private static WarehouseTask getAlmacenTask(
             EventDTO currentEvent, StatusTask statusTask, UserDTO userDTO) {
 
-        AlmacenTask almacenTask = new AlmacenTask();
+        WarehouseTask warehouseTask = new WarehouseTask();
 
         // Event
         Event event = new Event();
         event.setId(currentEvent.id());
-        almacenTask.setEvent(event);
+        warehouseTask.setEvent(event);
 
         // status
-        AlmacenTaskStatus almacenTaskStatus = new AlmacenTaskStatus();
-        almacenTaskStatus.setId(statusTask.getId());
-        almacenTask.setStatus(almacenTaskStatus);
+        WarehouseTaskStatus warehouseTaskStatus = new WarehouseTaskStatus();
+        warehouseTaskStatus.setId(statusTask.getId());
+        warehouseTask.setStatus(warehouseTaskStatus);
 
         // type
-        AttendAlmacenTaskType attendAlmacenTaskType = new AttendAlmacenTaskType();
-        attendAlmacenTaskType.setId(1);
-        almacenTask.setType(attendAlmacenTaskType);
+        AttendWarehouseTaskType attendWarehouseTaskType = new AttendWarehouseTaskType();
+        attendWarehouseTaskType.setId(1);
+        warehouseTask.setType(attendWarehouseTaskType);
 
         // User
         User userByCategory = new User();
         userByCategory.setId(userDTO.id());
-        almacenTask.setUserByCategory(userByCategory);
+        warehouseTask.setUserByCategory(userByCategory);
 
-        almacenTask.setFgActive(true);
+        warehouseTask.setFgActive(true);
 
-        return almacenTask;
+        return warehouseTask;
     }
 
 }

@@ -29,10 +29,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = CacheConstant.USERS_IN_CATEGORIES_BY_EVENT_CACHE_KEY)
-    public List<UserDTO> getUsersInCategoriesAlmacenAndEvent(final Integer eventId)
+    public List<UserDTO> getUsersInCategoriesWarehouseAndEvent(final Integer eventId)
             throws BusinessException {
         log.info(LogConstant.USERS_IN_CATEGORIES_BY_EVENT_GETTING_FROM_BD);
-        return userRepository.getUsersInCategoriesAlmacenAndEvent(eventId)
+        return userRepository.getUsersInCategoriesWarehouseAndEvent(eventId)
                 .stream()
                 .map(UserDTO::fromEntity)
                 .toList();
@@ -40,20 +40,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(value = CacheConstant.WAREHOUSE_MANAGERS_CACHE_KEY)
-    public List<UserDTO> getEncargadosDeAlmacenUsers ()
+    public List<UserDTO> getWarehouseManagers()
             throws BusinessException {
+
         log.info(LogConstant.WAREHOUSE_MANAGERS_GETTING_FROM_BD);
-        return userRepository.findByFgWarehouseManagerTrueAndFgActiveTrue()
+
+        return userRepository
+                .findByFgWarehouseManagerTrueAndFgActiveTrue()
                 .stream()
                 .map(UserDTO::fromEntity)
                 .toList();
     }
 
     @Override
-    @Cacheable(value = CacheConstant.CHOFERES_CACHE_KEY)
-    public List<UserDTO> getChoferes() throws BusinessException {
+    @Cacheable(value = CacheConstant.DELIVERY_DRIVERS_CACHE_KEY)
+    public List<UserDTO> getDeliveryDrivers() throws BusinessException {
         log.info(LogConstant.CHOFERES_GETTING_FROM_BD);
-        return userRepository.findByPositionIdAndFgActiveTrue(ApplicationConstant.PUESTO_CHOFER)
+        return userRepository
+                .findByPositionIdAndFgActiveTrue(ApplicationConstant.PUESTO_CHOFER)
                 .stream()
                 .map(UserDTO::fromEntity)
                 .toList();

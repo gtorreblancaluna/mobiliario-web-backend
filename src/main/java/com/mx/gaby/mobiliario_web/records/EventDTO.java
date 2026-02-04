@@ -83,13 +83,13 @@ public record EventDTO(
 
         event.setId(eventDTO.id());
 
-        Estado estado = new Estado();
+        EventState estado = new EventState();
         estado.setId(eventDTO.estadoId());
         event.setState(estado);
 
-        Customer customer = new Customer();
+        Client customer = new Client();
         customer.setId(eventDTO.clienteId());
-        event.setCustomer(customer);
+        event.setClient(customer);
 
         User user = new User();
         user.setId(eventDTO.usuarioId());
@@ -112,7 +112,7 @@ public record EventDTO(
         chofer.setId(eventDTO.choferId());
         event.setChofer(chofer);
 
-        TypeRenta type = new TypeRenta();
+        EventType type = new EventType();
         type.setId(eventDTO.tipoId());
         event.setType(type);
 
@@ -133,9 +133,9 @@ public record EventDTO(
                 event.getId(),
                 event.getState() != null ? event.getState().getId() : null,
                 event.getState() != null ? event.getState().getDescription() : null,
-                event.getCustomer() != null ? event.getCustomer().getId() : null,
-                event.getCustomer() != null ? event.getCustomer().getName()
-                        + ApplicationConstant.BLANK_SPACE + event.getCustomer().getLastName(): null,
+                event.getClient() != null ? event.getClient().getId() : null,
+                event.getClient() != null ? event.getClient().getFirstName()
+                        + ApplicationConstant.BLANK_SPACE + event.getClient().getLastName(): null,
                 event.getUser() != null ? event.getUser().getId() : null,
                 event.getUser() != null ? event.getUser().getName()
                         + ApplicationConstant.BLANK_SPACE + event.getUser().getLastName() : null,

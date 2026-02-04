@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @DynamicUpdate
 @Table(name = "tasks_chofer_delivery")
 @EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
-public class ChoferDeliveryTask {
+public class DeliveryDriverTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +29,11 @@ public class ChoferDeliveryTask {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_almacen_tasks_catalog_id", nullable = false)
-    private AlmacenTaskStatus status;
+    private WarehouseTaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attend_almacen_tasks_type_catalog_id", nullable = false)
-    private AttendAlmacenTaskType type;
+    private AttendWarehouseTaskType type;
 
     // El chofer asignado (de la tabla usuarios)
     @ManyToOne(fetch = FetchType.LAZY)

@@ -4,7 +4,7 @@ import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
-import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
+import com.mx.gaby.mobiliario_web.model.entitites.EventDetail;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
 import com.mx.gaby.mobiliario_web.records.*;
 import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
@@ -39,10 +39,10 @@ public abstract class EventService {
 
     }
 
-    private void savePayments (final RentaDetailDTO rentaDetailDTO)
+    private void savePayments (final EventDetailDTO eventDetailDTO)
             throws BusinessException {
 
-        if (rentaDetailDTO.payments().isEmpty()) {
+        if (eventDetailDTO.payments().isEmpty()) {
             return;
         }
 
@@ -50,10 +50,10 @@ public abstract class EventService {
 
             UserDTO userSession = userService.getAuthenticatedUser();
 
-            List<Payment> payments = rentaDetailDTO
+            List<Payment> payments = eventDetailDTO
                     .payments()
                     .stream()
-                    .map(dto -> PaymentDTO.fromDTO(dto, rentaDetailDTO.event().id()))
+                    .map(dto -> PaymentDTO.fromDTO(dto, eventDetailDTO.event().id()))
                     .toList();
 
             // identificar nuevos pagos y asignarle al usuario que esta en sesion.
@@ -66,41 +66,41 @@ public abstract class EventService {
 
             paymentRepository.saveAll(payments);
 
-            log.info(LogConstant.PAYMENTS_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio());
+            log.info(LogConstant.PAYMENTS_UPDATED_SUCCESSFULLY, eventDetailDTO.event().folio());
 
         } catch (Exception exception) {
 
-            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT,rentaDetailDTO.event().folio());
+            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT, eventDetailDTO.event().folio());
             throw new BusinessException(
                     MessageFormat.format(
-                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT,rentaDetailDTO.event()
+                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT, eventDetailDTO.event()
                                     .folio()),exception);
 
         }
     }
 
-    private void saveDetails (final RentaDetailDTO rentaDetailDTO)
+    private void saveDetails (final EventDetailDTO eventDetailDTO)
             throws BusinessException {
 
         try {
-            List<DetailRenta> detailRentaList
-                    = rentaDetailDTO
+            List<EventDetail> eventDetailList
+                    = eventDetailDTO
                     .detail()
                     .stream()
                     .map(detailRentaDTO ->
-                         (DetailRentaDTO.fromDTO(detailRentaDTO, rentaDetailDTO.event().id()))
+                         (DetailRentaDTO.fromDTO(detailRentaDTO, eventDetailDTO.event().id()))
                     )
                     .toList();
 
-            detailEventRepository.saveAll(detailRentaList);
+            detailEventRepository.saveAll(eventDetailList);
 
-            log.info(LogConstant.EVENT_DETAIL_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio());
+            log.info(LogConstant.EVENT_DETAIL_UPDATED_SUCCESSFULLY, eventDetailDTO.event().folio());
 
         } catch (Exception exception) {
-            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, rentaDetailDTO.event().folio());
+            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, eventDetailDTO.event().folio());
             throw new BusinessException(
                     MessageFormat.format(
-                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL,rentaDetailDTO.event()
+                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, eventDetailDTO.event()
                                     .folio()),exception);
         }
     }
@@ -140,21 +140,21 @@ public abstract class EventService {
         }
     }
 
-    private void validate (final RentaDetailDTO rentaDetailDTO) {
+    private void validate (final EventDetailDTO eventDetailDTO) {
 
-        validateStatusAndTypeEvent(rentaDetailDTO.event().estadoId().toString(),
-                rentaDetailDTO.event().tipoId().toString());
+        validateStatusAndTypeEvent(eventDetailDTO.event().estadoId().toString(),
+                eventDetailDTO.event().tipoId().toString());
 
-        ValidateUtil.isValidRange(rentaDetailDTO.event().horaEntrega());
+        ValidateUtil.isValidRange(eventDetailDTO.event().horaEntrega());
 
-        ValidateUtil.isValidRange(rentaDetailDTO.event().horaDevolucion());
+        ValidateUtil.isValidRange(eventDetailDTO.event().horaDevolucion());
 
         ValidateUtil.validateInitAndEndDate(
-                rentaDetailDTO.event().fechaEntrega(), rentaDetailDTO.event().fechaDevolucion());
+                eventDetailDTO.event().fechaEntrega(), eventDetailDTO.event().fechaDevolucion());
 
         float iva = 0f;
-        if (rentaDetailDTO.event().iva() != null) {
-            iva = rentaDetailDTO.event().iva();
+        if (eventDetailDTO.event().iva() != null) {
+            iva = eventDetailDTO.event().iva();
         }
         if (iva < 0 || iva > 100) {
             throw new BusinessException(ValidationMessageConstant.IVA_NOT_VALID);
@@ -164,10 +164,10 @@ public abstract class EventService {
 
             float discountPercentage = 0;
 
-            if (rentaDetailDTO.event().porcentajeDescuento() != null) {
+            if (eventDetailDTO.event().porcentajeDescuento() != null) {
                 discountPercentage
                         = Float.parseFloat(
-                                rentaDetailDTO.event().porcentajeDescuento());
+                                eventDetailDTO.event().porcentajeDescuento());
             }
 
             if (discountPercentage < 0 || discountPercentage > 100) {
@@ -179,26 +179,26 @@ public abstract class EventService {
                     ValidationMessageConstant.PARSE_NUMBER_EXCEPTION_PERCENTAGE_DISCOUNT);
         }
 
-        if (rentaDetailDTO.event().descripcion() != null
-                && !rentaDetailDTO.event().descripcion().isEmpty()
-                && rentaDetailDTO.event().descripcion().length() > ValidationMessageConstant.LIMIT_LENGTH_STRING) {
+        if (eventDetailDTO.event().descripcion() != null
+                && !eventDetailDTO.event().descripcion().isEmpty()
+                && eventDetailDTO.event().descripcion().length() > ValidationMessageConstant.LIMIT_LENGTH_STRING) {
             throw new BusinessException(ValidationMessageConstant.LIMIT_LENGTH_REACHED);
         }
 
-        if (rentaDetailDTO.event().comentario() != null
-                && !rentaDetailDTO.event().comentario().isEmpty()
-                && rentaDetailDTO.event().comentario().length() > ValidationMessageConstant.LIMIT_LENGTH_STRING) {
+        if (eventDetailDTO.event().comentario() != null
+                && !eventDetailDTO.event().comentario().isEmpty()
+                && eventDetailDTO.event().comentario().length() > ValidationMessageConstant.LIMIT_LENGTH_STRING) {
             throw new BusinessException(ValidationMessageConstant.LIMIT_LENGTH_REACHED);
         }
 
-        if (rentaDetailDTO.detail().isEmpty() ) {
+        if (eventDetailDTO.detail().isEmpty() ) {
             throw new BusinessException(
                     ValidationMessageConstant.ITEMS_NOT_BE_NULL);
         }
 
-        String typeId = String.valueOf(rentaDetailDTO.event().tipoId());
+        String typeId = String.valueOf(eventDetailDTO.event().tipoId());
 
-        long countOfNewPayments = rentaDetailDTO.payments().stream()
+        long countOfNewPayments = eventDetailDTO.payments().stream()
                 .filter(paymentDTO -> paymentDTO.id() == 0).count();
 
         if (typeId.equals(ApplicationConstant.TIPO_COTIZACION)
@@ -216,23 +216,23 @@ public abstract class EventService {
 
     }
 
-    protected abstract void save (final RentaDetailDTO rentaDetailDTO);
+    protected abstract void save (final EventDetailDTO eventDetailDTO);
 
     protected abstract void generateTasks(
-            final RentaDetailDTO rentaDetailDTO, EventDTO currentEventDTO) throws BusinessException;
+            final EventDetailDTO eventDetailDTO, EventDTO currentEventDTO) throws BusinessException;
 
     // template method
     public void executeSaveTemplate (
-            final RentaDetailDTO rentaDetailDTO)
+            final EventDetailDTO eventDetailDTO)
                 throws BusinessException {
 
-        validate(rentaDetailDTO);
+        validate(eventDetailDTO);
         // method 'save' will execute in child class.
-        save(rentaDetailDTO);
+        save(eventDetailDTO);
 
-        saveDetails(rentaDetailDTO);
+        saveDetails(eventDetailDTO);
 
-        savePayments(rentaDetailDTO);
+        savePayments(eventDetailDTO);
 
     }
 

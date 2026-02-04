@@ -17,28 +17,31 @@ import java.util.List;
 
 @Service
 @Log4j2
-public class TaskWarehouseChoferUpdateServiceImpl extends TaskWarehouseService {
+public class TaskWarehouseDeliveryDriverUpdateServiceImpl
+        extends TaskWarehouseService {
 
     private final MessageStorageService messageStorageService;
     private final ChoferDeliveryTaskRepository choferDeliveryTaskRepository;
 
-    public TaskWarehouseChoferUpdateServiceImpl(
+    public TaskWarehouseDeliveryDriverUpdateServiceImpl(
             MessageStorageService messageStorageService, ChoferDeliveryTaskRepository choferDeliveryTaskRepository) {
+        super(messageStorageService);
         this.messageStorageService = messageStorageService;
         this.choferDeliveryTaskRepository = choferDeliveryTaskRepository;
     }
 
 
-    private void generateTaskToChofer (
-            EventDTO eventToUpdate,
-            StatusTask statusTask, UserDTO userSession) {
+    private void generateTaskToDeliveryDriver(
+            final EventDTO eventToUpdate,
+            final StatusTask statusTask,
+            final UserDTO userSession) {
 
-        ChoferDeliveryTask choferDeliveryTask
+        DeliveryDriverTask deliveryDriverTask
                 = getChoferDeliveryTask(eventToUpdate,statusTask,eventToUpdate.choferId());
 
-        choferDeliveryTask.setCreatedBy(userSession.id());
+        deliveryDriverTask.setCreatedBy(userSession.id());
 
-        choferDeliveryTaskRepository.save(choferDeliveryTask);
+        choferDeliveryTaskRepository.save(deliveryDriverTask);
 
         String logMessage = MessageFormat.format(
                 LogConstant.MESSAGE_GENERATE_TASK_CHOFER,
@@ -63,7 +66,7 @@ public class TaskWarehouseChoferUpdateServiceImpl extends TaskWarehouseService {
         StatusTask statusTask = applyRulesAndGetStatus (
                 currentEvent,eventToUpdate,detailToUpdate,currentDetail);
 
-         generateTaskToChofer(eventToUpdate, statusTask, userSession);
+         generateTaskToDeliveryDriver(eventToUpdate, statusTask, userSession);
 
     }
 }

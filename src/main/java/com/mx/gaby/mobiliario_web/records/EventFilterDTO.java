@@ -1,6 +1,6 @@
 package com.mx.gaby.mobiliario_web.records;
 
-public record RentaFilterDTO(
+public record EventFilterDTO(
 
         String initFechaEntrega,
 

@@ -4,6 +4,19 @@ public final class ValidationMessageConstant {
 
     private ValidationMessageConstant() {}
 
+    public static final String NO_TASKS_GENERATED_BY_TYPE_AND_STATUS = """
+        No se generaron tareas para el folio [{0,number,#}].
+        Al ser de tipo [{1}], debe tener un Estado igual a [{2}].
+    """;
+
+    public static final String FOLIO_CHANGE_RULES_TEMPLATE = """
+    No se generaron tareas, ya que no coincidió con las reglas operativas actuales...
+    Reglas operativas aplicadas:
+    
+    1. El evento debe de ser de tipo [%s] o [%s] y el estado [%s] y hubo cambios en datos generales o articulos.
+    2. Cambio el estado del folio diferente a: [%s] o cambio el tipo.
+    """;
+
     public static final String NO_GENERATE_TASK_USERS_IN_CATEGORIES_NOT_FOUND =
             "No se generó tarea de almacén, por que no se obtuvieron usuarios por categoria para el folio: {0}";
 

@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @DynamicUpdate
 @Table(name = "tasks_almacen")
 @EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
-public class AlmacenTask {
+public class WarehouseTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,12 +31,12 @@ public class AlmacenTask {
     // Catálogo de estados que creamos anteriormente
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_almacen_tasks_catalog_id", nullable = false)
-    private AlmacenTaskStatus status;
+    private WarehouseTaskStatus status;
 
     // Catálogo de tipos de tarea que creamos anteriormente
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attend_almacen_tasks_type_catalog_id", nullable = false)
-    private AttendAlmacenTaskType type;
+    private AttendWarehouseTaskType type;
 
     // Usuario asignado por categoría (quien debe realizar la tarea)
     @ManyToOne(fetch = FetchType.LAZY)

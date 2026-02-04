@@ -4,10 +4,10 @@ public final class LogConstant {
 
     private LogConstant() {}
 
-    public static final String MSG_ALL_WORKFLOWS_PROCESSED = "✅ Todos los workflows de almacén procesados.";
+    public static final String MSG_ALL_WORKFLOWS_PROCESSED = "✅ Todos los flujos de tarea de almacén procesados para el evento {0,number,#}.";
 
-    public static final String INIT_WORK_FLOW_TASK = "Iniciando flujo de tarea para evento: {}";
-    public static final String END_WORK_FLOW_TASK = "Flujo de tarea finalizado exitosamente, evento: {}";
+    public static final String INIT_WORK_FLOW_TASK = "▶\uFE0F Iniciando flujo de tarea para el evento {0,number,#}";
+    public static final String END_WORK_FLOW_TASK = "Flujo de tarea finalizado exitosamente, evento: {0,number,#}";
 
     public static final String ERROR_WHEN_GENERATE_TASK_EXECUTED
             = "Ocurrio un error al intentar generar las tareas para el folio: {}";

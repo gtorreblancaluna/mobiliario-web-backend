@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface UserService {
 
-    List<UserDTO> getUsersInCategoriesAlmacenAndEvent (Integer eventId)
+    List<UserDTO> getUsersInCategoriesWarehouseAndEvent(Integer eventId)
             throws BusinessException;
 
-    List<UserDTO> getEncargadosDeAlmacenUsers ()
+    List<UserDTO> getWarehouseManagers()
             throws BusinessException;
 
-    List<UserDTO> getChoferes ()
+    List<UserDTO> getDeliveryDrivers()
             throws BusinessException;
 
     UserDTO getAuthenticatedUser();

@@ -2,6 +2,7 @@ package com.mx.gaby.mobiliario_web.services;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
+import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
@@ -9,6 +10,8 @@ import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +19,12 @@ import java.util.stream.Collectors;
 
 @Log4j2
 public abstract class TaskWarehouseService {
+
+    private final MessageStorageService messageStorageService;
+
+    protected TaskWarehouseService(MessageStorageService messageStorageService) {
+        this.messageStorageService = messageStorageService;
+    }
 
     protected boolean checkIfItemsHasBeenUpdated(
             final List<DetailRentaDTO> detailToUpdate,
@@ -46,33 +55,33 @@ public abstract class TaskWarehouseService {
         });
     }
 
-    protected ChoferDeliveryTask getChoferDeliveryTask (
+    protected DeliveryDriverTask getChoferDeliveryTask (
             EventDTO eventToUpdate,StatusTask statusTask, Integer choferId) {
 
-        ChoferDeliveryTask choferDeliveryTask = new ChoferDeliveryTask();
+        DeliveryDriverTask deliveryDriverTask = new DeliveryDriverTask();
 
         // Event
         Event event = new Event();
         event.setId(eventToUpdate.id());
-        choferDeliveryTask.setEvent(event);
+        deliveryDriverTask.setEvent(event);
 
         // status
-        AlmacenTaskStatus almacenTaskStatus = new AlmacenTaskStatus();
-        almacenTaskStatus.setId(statusTask.getId());
-        choferDeliveryTask.setStatus(almacenTaskStatus);
+        WarehouseTaskStatus warehouseTaskStatus = new WarehouseTaskStatus();
+        warehouseTaskStatus.setId(statusTask.getId());
+        deliveryDriverTask.setStatus(warehouseTaskStatus);
 
         //type
-        AttendAlmacenTaskType attendAlmacenTaskType = new AttendAlmacenTaskType();
-        attendAlmacenTaskType.setId(1);
-        choferDeliveryTask.setType(attendAlmacenTaskType);
+        AttendWarehouseTaskType attendWarehouseTaskType = new AttendWarehouseTaskType();
+        attendWarehouseTaskType.setId(1);
+        deliveryDriverTask.setType(attendWarehouseTaskType);
 
         User chofer = new User();
         chofer.setId(choferId);
-        choferDeliveryTask.setChofer(chofer);
+        deliveryDriverTask.setChofer(chofer);
 
         chofer.setFgActive(true);
 
-        return choferDeliveryTask;
+        return deliveryDriverTask;
     }
 
     protected boolean checkIfGeneralDataHasBeenUpdated(
@@ -99,19 +108,18 @@ public abstract class TaskWarehouseService {
                 currentDetail
         );
 
-        boolean generalDataHasBeenupdated = checkIfGeneralDataHasBeenUpdated(
+        boolean generalDataHasBeenUpdated = checkIfGeneralDataHasBeenUpdated(
                 eventToUpdate,currentEvent
         );
 
         if (eventToUpdate.tipoId().toString().equals(ApplicationConstant.TIPO_COTIZACION)
                 && !eventToUpdate.estadoId().toString().equals(ApplicationConstant.ESTADO_PENDIENTE)) {
-            throw new BusinessException("""
-                    No se generaron tareas para el folio %s.
-                    Al ser de tipo %s, debe tener un Estado igual a %s.
-                    """.formatted(
-                    currentEvent.folio(),
-                    ApplicationConstant.DS_TIPO_COTIZACION,
-                    ApplicationConstant.DS_ESTADO_PENDIENTE
+            throw new BusinessException(
+                    MessageFormat.format(
+                            ValidationMessageConstant.NO_TASKS_GENERATED_BY_TYPE_AND_STATUS,
+                            currentEvent.folio(),
+                            ApplicationConstant.DS_TIPO_COTIZACION,
+                            ApplicationConstant.DS_ESTADO_PENDIENTE
             ));
         }
 
@@ -121,8 +129,8 @@ public abstract class TaskWarehouseService {
         String currentTypeId = currentEvent.tipoId().toString();
         String currentStatusId = currentEvent.estadoId().toString();
 
-        boolean isApartado = statusId.equals(ApplicationConstant.ESTADO_APARTADO);
-        boolean isPedidoOrFabricacion = typeId.equals(ApplicationConstant.TIPO_PEDIDO)
+        boolean isReserved = statusId.equals(ApplicationConstant.ESTADO_APARTADO);
+        boolean isOrderOrManufacturing = typeId.equals(ApplicationConstant.TIPO_PEDIDO)
                 || typeId.equals(ApplicationConstant.TIPO_FABRICACION);
 
         boolean typeChanged = !typeId.equals(currentTypeId);
@@ -130,10 +138,10 @@ public abstract class TaskWarehouseService {
 
         StatusTask resultStatus = null;
 
-        if (generalDataHasBeenupdated && isPedidoOrFabricacion && isApartado) {
+        if (generalDataHasBeenUpdated && isOrderOrManufacturing && isReserved) {
             resultStatus = StatusTask.GENERAL_DATA_UPDATED;
         }
-        else if (itemsHasBeenUpdates && isPedidoOrFabricacion && isApartado) {
+        else if (itemsHasBeenUpdates && isOrderOrManufacturing && isReserved) {
             resultStatus = StatusTask.UPDATE_ITEMS;
         }
         else if (typeChanged && statusChanged) {
@@ -151,29 +159,15 @@ public abstract class TaskWarehouseService {
             return resultStatus;
         } else {
 
-            String rulesActive = """
-                1. Cambio en los datos generales y el folio es de tipo: %s
-                2. Cambio en los datos generales y el folio es de tipo: %s y estado: %s.
-                3. Cambio en artículos y el folio es de tipo: %s y estado: %s.
-                4. Cambio en artículos y el folio es de tipo: %s y estado: %s.
-                5. Cambio el estado del folio diferente a: %s
-                6. Cambio el tipo del folio.
-                7. Cambio el estado y tipo del folio.
-                """.formatted(
+            String messageRulesActive =
+                    ValidationMessageConstant.FOLIO_CHANGE_RULES_TEMPLATE.formatted(
                     ApplicationConstant.DS_TIPO_PEDIDO,
-                    ApplicationConstant.DS_TIPO_FABRICACION,
-                    ApplicationConstant.DS_ESTADO_APARTADO,
-                    ApplicationConstant.DS_TIPO_PEDIDO,
-                    ApplicationConstant.DS_ESTADO_APARTADO,
                     ApplicationConstant.DS_TIPO_FABRICACION,
                     ApplicationConstant.DS_ESTADO_APARTADO,
                     ApplicationConstant.DS_ESTADO_PENDIENTE
             );
 
-            throw new BusinessException("""
-                No se generaron tareas, ya que no coincidió con las reglas operativas actuales...
-                Reglas operativas aplicadas: %s
-                """.formatted(rulesActive));
+            throw new BusinessException(messageRulesActive);
         }
 
     }
@@ -214,14 +208,22 @@ public abstract class TaskWarehouseService {
             UserDTO userSession) throws BusinessException {
 
         // 1. Logs o pre-validaciones globales (Dry Run)
-        log.info(LogConstant.INIT_WORK_FLOW_TASK, currentEvent.folio());
+
+        String initWorkFlowMessage =
+                MessageFormat.format(LogConstant.INIT_WORK_FLOW_TASK,currentEvent.folio());
+
+        messageStorageService.addMessage(initWorkFlowMessage);
+        log.info(initWorkFlowMessage);
 
         // 2. Llamada al método protegido que solo las hijas conocen
        process(currentEvent, eventToUpdate, detailToUpdate,
                currentDetail, userSession);
 
         // 3. Post-procesamiento o auditoría global
-        log.info(LogConstant.END_WORK_FLOW_TASK, currentEvent.folio());
+        String endWorkFlowMessage =
+                MessageFormat.format(LogConstant.END_WORK_FLOW_TASK,currentEvent.folio());
+        messageStorageService.addMessage(endWorkFlowMessage);
+        log.info(endWorkFlowMessage);
 
     }
 

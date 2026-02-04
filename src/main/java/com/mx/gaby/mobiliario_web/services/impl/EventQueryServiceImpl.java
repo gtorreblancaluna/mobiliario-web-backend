@@ -2,7 +2,7 @@ package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.exceptions.NotFoundException;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
-import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
+import com.mx.gaby.mobiliario_web.model.entitites.EventDetail;
 import com.mx.gaby.mobiliario_web.model.entitites.Event;
 import com.mx.gaby.mobiliario_web.records.*;
 import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
@@ -29,13 +29,13 @@ public class EventQueryServiceImpl implements EventQueryService {
     }
 
     @Override
-    public RentaDetailDTO findById(Integer id) {
+    public EventDetailDTO findById(Integer id) {
 
         Event eventEntity = eventRepository.findById(id)
                 .orElseThrow(() ->
                         new NotFoundException("Renta con ID " + id + " no encontrada."));
 
-        List<DetailRenta> detailEntities
+        List<EventDetail> detailEntities
                 = detailEventRepository.findByEventId(eventEntity.getId());
 
         List<Payment> abonosEntities =
@@ -51,18 +51,18 @@ public class EventQueryServiceImpl implements EventQueryService {
                         .map(DetailRentaDTO::fromEntity)
                         .toList();
 
-        RentaTotalesResponseDTO totals
-                = RentaTotalesResponseDTO.calculateTotals(eventEntity,detailEntities,abonos);
+        EventTotalsResponseDTO totals
+                = EventTotalsResponseDTO.calculateTotals(eventEntity,detailEntities,abonos);
 
-        return new RentaDetailDTO(
+        return new EventDetailDTO(
                 EventDTO.fromEntity(eventEntity),detailRentas,totals,abonos);
     }
 
     @Override
-    public List<EventDTO> getFromQuery(RentaFilterDTO rentaFilterDTO) {
+    public List<EventDTO> getFromQuery(EventFilterDTO eventFilterDTO) {
 
         Specification<Event> spec =
-                RentaSpecification.applyFilter(rentaFilterDTO);
+                RentaSpecification.applyFilter(eventFilterDTO);
 
         List<Event> events = eventRepository.findAll(spec);
 

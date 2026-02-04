@@ -1,11 +1,11 @@
 package com.mx.gaby.mobiliario_web.records;
 
-import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
+import com.mx.gaby.mobiliario_web.model.entitites.EventDetail;
 import com.mx.gaby.mobiliario_web.model.entitites.Event;
 
 import java.util.List;
 
-public record RentaTotalesResponseDTO(
+public record EventTotalsResponseDTO(
         Float total,
         Float totalIva,
         Float totalDiscount,
@@ -13,9 +13,9 @@ public record RentaTotalesResponseDTO(
         Float totalPayments
 ) {
 
-    public static RentaTotalesResponseDTO calculateTotals
+    public static EventTotalsResponseDTO calculateTotals
             (Event event,
-             List<DetailRenta> detail, List<PaymentDTO> payments) {
+             List<EventDetail> detail, List<PaymentDTO> payments) {
 
         float subTotalItems = 0F;
         float totalDiscount = 0F;
@@ -32,17 +32,17 @@ public record RentaTotalesResponseDTO(
                 .filter(p -> p != null)        // Seguridad: evita NullPointerException
                 .reduce(0f, Float::sum);       // Suma todos los valores
 
-        for (DetailRenta detailRenta : detail) {
+        for (EventDetail eventDetail : detail) {
 
             float subtotalByItem =
-                    detailRenta.getAmount() * detailRenta.getUnitPrice();
+                    eventDetail.getAmount() * eventDetail.getUnitPrice();
 
             float totalDiscountByItem = 0F;
 
-            if (detailRenta.getDiscountPercentage() != null
-                    && detailRenta.getDiscountPercentage() > 0F ) {
+            if (eventDetail.getDiscountPercentage() != null
+                    && eventDetail.getDiscountPercentage() > 0F ) {
                 totalDiscountByItem
-                        = subtotalByItem * (detailRenta.getDiscountPercentage() / 100f);
+                        = subtotalByItem * (eventDetail.getDiscountPercentage() / 100f);
             }
             subTotalItems += subtotalByItem - totalDiscountByItem;
         }
@@ -64,7 +64,7 @@ public record RentaTotalesResponseDTO(
 
         float total = totalCalculoConIVA - totalPayments;
 
-        return new RentaTotalesResponseDTO(
+        return new EventTotalsResponseDTO(
                 total,
                 calculoIVA,
                 totalDiscount,

@@ -6,7 +6,7 @@ import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.Event;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
-import com.mx.gaby.mobiliario_web.records.RentaDetailDTO;
+import com.mx.gaby.mobiliario_web.records.EventDetailDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
 import com.mx.gaby.mobiliario_web.repositories.DetailEventRepository;
 import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 public class EventUpdateServiceImpl extends EventService {
 
     private final TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService;
-    private final TaskWarehouseChoferUpdateServiceImpl taskDriverManUpdateService;
+    private final TaskWarehouseDeliveryDriverUpdateServiceImpl taskDeliveryDriverUpdateService;
     private final TaskWarehouseManagerUpdateServiceImpl taskWarehouseManagerUpdateService;
     private final MessageStorageService messageStorageService;
 
@@ -41,7 +41,7 @@ public class EventUpdateServiceImpl extends EventService {
             DetailEventRepository detailEventRepository,
             PaymentRepository paymentRepository,
             TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService,
-            TaskWarehouseChoferUpdateServiceImpl taskDriverManUpdateService,
+            TaskWarehouseDeliveryDriverUpdateServiceImpl taskDeliveryDriverUpdateService,
             UserService userService,
             UserRepository userRepository,
             EventRepository eventRepository,
@@ -50,23 +50,25 @@ public class EventUpdateServiceImpl extends EventService {
 
         super(eventRepository,
                 detailEventRepository,
-                paymentRepository, userService, userRepository); // El padre recibe su dependencia
+                paymentRepository,
+                userService, userRepository);
+
         this.taskWarehouseUpdateService = taskWarehouseUpdateService;
-        this.taskDriverManUpdateService = taskDriverManUpdateService;
+        this.taskDeliveryDriverUpdateService = taskDeliveryDriverUpdateService;
         this.taskWarehouseManagerUpdateService = taskWarehouseManagerUpdateService;
         this.messageStorageService = messageStorageService;
     }
 
 
     @Override
-    protected void save(RentaDetailDTO rentaDetailDTO) {
+    protected void save(final EventDetailDTO eventDetailDTO) {
 
         Event eventToUpdateEntity
-                = EventDTO.fromDTO(rentaDetailDTO.event());
+                = EventDTO.fromDTO(eventDetailDTO.event());
 
         // necessary for generate task.
         @NonNull Optional<Event> currentEventOptional
-                = eventRepository.findById(rentaDetailDTO.event().id());
+                = eventRepository.findById(eventDetailDTO.event().id());
 
         if (currentEventOptional.isEmpty()) {
             throw new BusinessException(
@@ -80,7 +82,7 @@ public class EventUpdateServiceImpl extends EventService {
 
         String logMessage =
                 MessageFormat.format(
-                        LogConstant.EVENT_UPDATED_SUCCESSFULLY, rentaDetailDTO.event().folio(),
+                        LogConstant.EVENT_UPDATED_SUCCESSFULLY, eventDetailDTO.event().folio(),
                         userSession.fullName());
 
         log.info(logMessage);
@@ -90,13 +92,13 @@ public class EventUpdateServiceImpl extends EventService {
         EventDTO currentEventDTO
                 = EventDTO.fromEntity(currentEventOptional.get());
 
-        generateTasks(rentaDetailDTO,currentEventDTO);
+        generateTasks(eventDetailDTO,currentEventDTO);
 
     }
 
     @Override
     protected void generateTasks (
-            final RentaDetailDTO rentaDetailDTO,
+            final EventDetailDTO eventDetailDTO,
             final EventDTO currentEventDTO)
                 throws BusinessException {
 
@@ -108,8 +110,8 @@ public class EventUpdateServiceImpl extends EventService {
                 .toList();
 
 
-        EventDTO eventToUpdate = rentaDetailDTO.event();
-        List<DetailRentaDTO> detailToUpdate = rentaDetailDTO.detail();
+        EventDTO eventToUpdate = eventDetailDTO.event();
+        List<DetailRentaDTO> detailToUpdate = eventDetailDTO.detail();
         UserDTO userSession = userService.getAuthenticatedUser();
 
         CompletableFuture<Void> taskWarehouse = CompletableFuture.runAsync(() -> {
@@ -128,7 +130,7 @@ public class EventUpdateServiceImpl extends EventService {
         CompletableFuture<Void> taskDriverMan
                 = CompletableFuture.runAsync(() -> {
             try {
-                taskDriverManUpdateService
+                taskDeliveryDriverUpdateService
                         .executeTaskWorkflow(
                                 currentEventDTO,
                                 eventToUpdate,
@@ -153,9 +155,12 @@ public class EventUpdateServiceImpl extends EventService {
             }
         });
 
+        String allWorkflowsProcessedMessage
+                = MessageFormat.format(
+                        LogConstant.MSG_ALL_WORKFLOWS_PROCESSED,currentEventDTO.folio());
+
         CompletableFuture.allOf(taskWarehouse, taskDriverMan, taskWarehouseManager)
-                .thenRun(() -> messageStorageService.addMessage(
-                        LogConstant.MSG_ALL_WORKFLOWS_PROCESSED));
+                .thenRun(() -> messageStorageService.addMessage(allWorkflowsProcessedMessage));
 
     }
 

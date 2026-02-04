@@ -2,9 +2,9 @@ package com.mx.gaby.mobiliario_web.records;
 
 import java.util.List;
 
-public record RentaDetailDTO(
+public record EventDetailDTO(
         EventDTO event,
         List<DetailRentaDTO> detail,
-        RentaTotalesResponseDTO totals,
+        EventTotalsResponseDTO totals,
         List<PaymentDTO> payments) {
 }

@@ -1,6 +1,7 @@
 package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
+import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
@@ -27,21 +28,20 @@ public class TaskWarehouseManagerUpdateServiceImpl extends TaskWarehouseService 
     public TaskWarehouseManagerUpdateServiceImpl(
             UserService userService,
             ChoferDeliveryTaskRepository choferDeliveryTaskRepository, MessageStorageService messageStorageService) {
+        super(messageStorageService);
         this.userService = userService;
         this.choferDeliveryTaskRepository = choferDeliveryTaskRepository;
         this.messageStorageService = messageStorageService;
     }
 
-    private List<UserDTO> getEncargadosDeAlmacenUsers ()
+    private List<UserDTO> getWarehouseManagers()
             throws BusinessException {
 
-        List<UserDTO> users = userService.getEncargadosDeAlmacenUsers();
+        List<UserDTO> users
+                = userService.getWarehouseManagers();
 
         if (users.isEmpty()) {
-            throw new BusinessException("""
-                    No se generaron tareas
-                    para los encargados de almacen
-                    por que no se obtuvieron usuarios de la base de datos.""");
+            throw new BusinessException(MessageConstant.TASK_WAREHOUSE_NO_USERS_FOUND);
         }
 
         return users;
@@ -49,20 +49,20 @@ public class TaskWarehouseManagerUpdateServiceImpl extends TaskWarehouseService 
 
 
     private void generateTaskWarehouseManagers(
-            EventDTO eventToUpdate,
-            StatusTask statusTask,
+            final EventDTO eventToUpdate,
+            final StatusTask statusTask,
             final UserDTO userSession) throws BusinessException{
 
-        List<UserDTO> warehouseManagers = getEncargadosDeAlmacenUsers();
+        List<UserDTO> warehouseManagers = getWarehouseManagers();
 
         for (UserDTO warehouseManager : warehouseManagers) {
 
-            ChoferDeliveryTask choferDeliveryTask
+            DeliveryDriverTask deliveryDriverTask
                     = getChoferDeliveryTask(eventToUpdate,statusTask,warehouseManager.id());
 
-            choferDeliveryTask.setCreatedBy(userSession.id());
+            deliveryDriverTask.setCreatedBy(userSession.id());
 
-            choferDeliveryTaskRepository.save(choferDeliveryTask);
+            choferDeliveryTaskRepository.save(deliveryDriverTask);
 
             String logMessage = MessageFormat.format(LogConstant.MESSAGE_GENERATE_TASK_WAREHGOUSE_MANAGER,
                     warehouseManager.name(),eventToUpdate.folio());

@@ -21,13 +21,13 @@ public class Event {
     @JoinColumn(name = "id_estado",
             nullable = false,
             referencedColumnName = "id_estado")
-    private Estado state;
+    private EventState state;
 
     @ManyToOne
     @JoinColumn(name = "id_clientes",
             nullable = false,
             referencedColumnName = "id_clientes")
-    private Customer customer;
+    private Client client;
 
     @ManyToOne
     @JoinColumn(name = "id_usuarios",
@@ -63,7 +63,7 @@ public class Event {
     @JoinColumn(name = "id_tipo",
             nullable = false,
             referencedColumnName = "id_tipo")
-    private TypeRenta type;
+    private EventType type;
 
     private Float depositoGarantia;
     private Float envioRecoleccion;

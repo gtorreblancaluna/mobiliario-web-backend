@@ -12,8 +12,8 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
-@Table(name = "status_almacen_tasks_catalog")
-public class AlmacenTaskStatus {
+@Table(name = "attend_almacen_tasks_type_catalog")
+public class AttendWarehouseTaskType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +31,8 @@ public class AlmacenTaskStatus {
     private Timestamp updatedAt;
 
     /**
-     * fg_active mapeado como String para manejar el ENUM('1','0') de MySQL.
-     * El valor por defecto se maneja en la lógica o mediante la definición de la columna.
+     * fg_active mapeado para el ENUM('1','0') de MySQL.
+     * Por defecto se inicializa en '1' (Activo).
      */
     @Column(name = "fg_active", nullable = false,
             columnDefinition = "ENUM('1','0') DEFAULT '1'")

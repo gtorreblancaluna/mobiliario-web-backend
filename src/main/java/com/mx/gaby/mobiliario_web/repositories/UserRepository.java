@@ -42,7 +42,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     AND u.activo = 1    
     ORDER BY nombre ASC
     """, nativeQuery = true)
-    List<User> getUsersInCategoriesAlmacenAndEvent(@Param("eventId") Integer eventId);
+    List<User> getUsersInCategoriesWarehouseAndEvent(@Param("eventId") Integer eventId);
 
     List<User> findByFgWarehouseManagerTrueAndFgActiveTrue();
 

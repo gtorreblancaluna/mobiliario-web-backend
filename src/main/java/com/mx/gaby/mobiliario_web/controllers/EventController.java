@@ -2,8 +2,8 @@ package com.mx.gaby.mobiliario_web.controllers;
 
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
-import com.mx.gaby.mobiliario_web.records.RentaDetailDTO;
-import com.mx.gaby.mobiliario_web.records.RentaFilterDTO;
+import com.mx.gaby.mobiliario_web.records.EventDetailDTO;
+import com.mx.gaby.mobiliario_web.records.EventFilterDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.services.EventQueryService;
 import com.mx.gaby.mobiliario_web.services.impl.EventUpdateServiceImpl;
@@ -30,29 +30,29 @@ public class EventController {
 
     @PostMapping("/save")
     public ResponseEntity<Void> save(
-            @RequestBody RentaDetailDTO rentaDetailDTO) throws BusinessException {
+            @RequestBody EventDetailDTO eventDetailDTO) throws BusinessException {
 
-        log.info(LogConstant.INIT_SAVE_EVENT, rentaDetailDTO);
+        log.info(LogConstant.INIT_SAVE_EVENT, eventDetailDTO);
 
-        rentaUpdateService.executeSaveTemplate(rentaDetailDTO);
+        rentaUpdateService.executeSaveTemplate(eventDetailDTO);
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping
     public ResponseEntity<List<EventDTO>> getByFilter(
-            @RequestBody RentaFilterDTO rentaFilterDTO) {
+            @RequestBody EventFilterDTO eventFilterDTO) {
 
-        log.info(LogConstant.INIT_GET_EVENT_BY_FILTER, rentaFilterDTO);
+        log.info(LogConstant.INIT_GET_EVENT_BY_FILTER, eventFilterDTO);
 
         List<EventDTO> eventDTOList =
-                eventQueryService.getFromQuery(rentaFilterDTO);
+                eventQueryService.getFromQuery(eventFilterDTO);
 
         return ResponseEntity.ok(eventDTOList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RentaDetailDTO> getEventById(@PathVariable Integer id) {
+    public ResponseEntity<EventDetailDTO> getEventById(@PathVariable Integer id) {
         return ResponseEntity.ok(eventQueryService.findById(id));
     }
 

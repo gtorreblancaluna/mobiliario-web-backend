@@ -7,14 +7,13 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "estado")
-public class Estado {
+@Table(name = "tipo")
+public class EventType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_estado")
+    @Column(name = "id_tipo")
     private Integer id;
 
-    @Column(name = "descripcion")
-    private String description;
+    private String tipo;
 }

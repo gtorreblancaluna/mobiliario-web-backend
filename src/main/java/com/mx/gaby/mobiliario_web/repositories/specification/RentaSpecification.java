@@ -3,7 +3,7 @@ package com.mx.gaby.mobiliario_web.repositories.specification;
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.model.entitites.Event;
-import com.mx.gaby.mobiliario_web.records.RentaFilterDTO;
+import com.mx.gaby.mobiliario_web.records.EventFilterDTO;
 import com.mx.gaby.mobiliario_web.utils.ValidateUtil;
 import jakarta.persistence.criteria.Expression;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +21,7 @@ public class RentaSpecification {
             = DateTimeFormatter.ofPattern(ApplicationConstant.FORMAT_DATE_DD_MM_YYY);
 
     // Metodo principal para construir la Specification combinada
-    public static Specification<Event> applyFilter(RentaFilterDTO rentaFilterDTO) {
+    public static Specification<Event> applyFilter(EventFilterDTO eventFilterDTO) {
 
         // Inicializa la Specification con el primer criterio.
         // Si tienesNombre() devuelve null (porque nombre es nulo), el where() actúa como un 'true'
@@ -31,17 +31,17 @@ public class RentaSpecification {
         boolean filterApplied = false;
 
         // Encadenar los demás criterios con AND
-        if (rentaFilterDTO.initFechaEntrega() != null
-                && rentaFilterDTO.endFechaEntrega() != null) {
+        if (eventFilterDTO.initFechaEntrega() != null
+                && eventFilterDTO.endFechaEntrega() != null) {
 
             ValidateUtil.validateInitAndEndDate(
-                    rentaFilterDTO.initFechaEntrega(),
-                    rentaFilterDTO.endFechaEntrega());
+                    eventFilterDTO.initFechaEntrega(),
+                    eventFilterDTO.endFechaEntrega());
             filterApplied = true;
             spec = spec.and(
                             betweenInDates
-                                    (rentaFilterDTO.initFechaEntrega(),
-                                            rentaFilterDTO.endFechaEntrega(),
+                                    (eventFilterDTO.initFechaEntrega(),
+                                            eventFilterDTO.endFechaEntrega(),
                                             ApplicationConstant.FECHA_ENTREGA_ENTITY));
         }
 

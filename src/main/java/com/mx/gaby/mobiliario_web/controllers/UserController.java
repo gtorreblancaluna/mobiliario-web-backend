@@ -23,7 +23,7 @@ public class UserController {
 
     @GetMapping("/choferes")
     public ResponseEntity<List<UserDTO>> getChoferes() {
-        List<UserDTO> choferes = userService.getChoferes();
+        List<UserDTO> choferes = userService.getDeliveryDrivers();
         return ResponseEntity.ok(choferes);
     }
 }

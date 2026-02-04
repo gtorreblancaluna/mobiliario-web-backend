@@ -23,7 +23,7 @@ public interface EventRepository extends JpaRepository<Event, Integer>,
     @Query("""
         UPDATE Event e SET
         e.state.id = :#{#event.state.id},
-        e.customer.id = :#{#event.customer.id},
+        e.client.id = :#{#event.client.id},
         e.fechaEntrega = :#{#event.fechaEntrega},
         e.fechaEvento = :#{#event.fechaEvento},
         e.horaEntrega = :#{#event.horaEntrega},

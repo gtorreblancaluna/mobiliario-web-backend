@@ -2,18 +2,20 @@ package com.mx.gaby.mobiliario_web.model.entitites;
 
 import com.mx.gaby.mobiliario_web.configs.converters.BooleanToStringConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "attend_almacen_tasks_type_catalog")
-public class AttendAlmacenTaskType {
+@Table(name = "catalog_social_media_contact")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SocialMediaContact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,18 +26,17 @@ public class AttendAlmacenTaskType {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
     /**
-     * fg_active mapeado para el ENUM('1','0') de MySQL.
-     * Por defecto se inicializa en '1' (Activo).
+     * Usamos el conversor que creamos para manejarlo como boolean en Java
+     * pero que se guarde como ENUM('1','0') en MySQL.
      */
-    @Column(name = "fg_active", nullable = false,
-            columnDefinition = "ENUM('1','0') DEFAULT '1'")
     @Convert(converter = BooleanToStringConverter.class)
-    private boolean fgActive = true;
+    @Column(name = "fg_active", nullable = false)
+    private Boolean isActive = true;
 }

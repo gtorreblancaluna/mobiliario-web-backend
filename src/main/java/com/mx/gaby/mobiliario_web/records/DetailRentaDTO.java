@@ -1,6 +1,6 @@
 package com.mx.gaby.mobiliario_web.records;
 
-import com.mx.gaby.mobiliario_web.model.entitites.DetailRenta;
+import com.mx.gaby.mobiliario_web.model.entitites.EventDetail;
 import com.mx.gaby.mobiliario_web.model.entitites.Item;
 
 /**
@@ -18,9 +18,9 @@ public record DetailRentaDTO(
         Float subtotal    // Calculado: (cantidad * precio) - descuento
 ) {
 
-    public static DetailRenta fromDTO (DetailRentaDTO detailRentaDTO, Integer eventId) {
+    public static EventDetail fromDTO (DetailRentaDTO detailRentaDTO, Integer eventId) {
 
-        DetailRenta detailRenta = new DetailRenta();
+        EventDetail eventDetail = new EventDetail();
 
         Integer detailId = null;
 
@@ -29,23 +29,23 @@ public record DetailRentaDTO(
             detailId = detailRentaDTO.id();
         }
 
-        detailRenta.setId(detailId);
-        detailRenta.setAmount(detailRentaDTO.amount());
-        detailRenta.setEventId(eventId);
+        eventDetail.setId(detailId);
+        eventDetail.setAmount(detailRentaDTO.amount());
+        eventDetail.setEventId(eventId);
 
         Item item = new Item();
         item.setId(detailRentaDTO.itemId());
-        detailRenta.setItem(item);
+        eventDetail.setItem(item);
 
-        detailRenta.setUnitPrice(detailRentaDTO.unitPrice());
-        detailRenta.setComment(detailRentaDTO.comment());
-        detailRenta.setDiscountPercentage(detailRentaDTO.discountPercentage());
+        eventDetail.setUnitPrice(detailRentaDTO.unitPrice());
+        eventDetail.setComment(detailRentaDTO.comment());
+        eventDetail.setDiscountPercentage(detailRentaDTO.discountPercentage());
 
-        return detailRenta;
+        return eventDetail;
 
     }
 
-    public static DetailRentaDTO fromEntity(DetailRenta entity) {
+    public static DetailRentaDTO fromEntity(EventDetail entity) {
 
         float rawSubtotal = entity.getAmount() * entity.getUnitPrice();
 
