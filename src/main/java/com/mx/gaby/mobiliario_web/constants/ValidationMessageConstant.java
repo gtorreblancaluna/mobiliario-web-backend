@@ -4,6 +4,15 @@ public final class ValidationMessageConstant {
 
     private ValidationMessageConstant() {}
 
+    public static final String STATUS_ID_IS_REQUIRED = "Estado de evento es requerido.";
+    public static final String CLIENT_ID_IS_REQUIRED = "Cliente es requerido.";
+    public static final String DELIVER_DRIVER_ID_IS_REQUIRED = "Chofer es requerido.";
+    public static final String TYPE_ID_IS_REQUIRED = "Tipo de evento es requerido.";
+
+    public static final String NO_TASKS_GENERATED_BY_COTIZACION_AND_PENDING = """
+    No generaron tareas de logística/almacén para el folio [{0,number,#}]. Al ser de tipo [{1}].
+    """;
+
     public static final String NO_TASKS_GENERATED_BY_TYPE_AND_STATUS = """
         No se generaron tareas para el folio [{0,number,#}].
         Al ser de tipo [{1}], debe tener un Estado igual a [{2}].

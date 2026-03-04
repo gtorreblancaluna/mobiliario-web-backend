@@ -27,4 +27,4 @@ EXPOSE 8080
 
 # 4. ENTRYPOINT flexible
 # Usamos "sh -c" para que las variables de entorno se expandan correctamente
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar app.jar"]

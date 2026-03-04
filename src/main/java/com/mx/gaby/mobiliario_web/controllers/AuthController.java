@@ -7,6 +7,7 @@ import com.mx.gaby.mobiliario_web.model.entitites.User;
 import com.mx.gaby.mobiliario_web.model.responses.AuthenticationResponse;
 import com.mx.gaby.mobiliario_web.model.responses.UserDataResponse;
 import com.mx.gaby.mobiliario_web.records.AuthenticationRequestDTO;
+import com.mx.gaby.mobiliario_web.services.MessageStorageService;
 import com.mx.gaby.mobiliario_web.services.impl.UserDetailsServiceImpl;
 import com.mx.gaby.mobiliario_web.utils.JwtUtil;
 import jakarta.validation.Valid;
@@ -19,6 +20,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
+
 @RestController
 @RequestMapping("/api")
 @Log4j2
@@ -26,16 +29,18 @@ public class AuthController {
 
 
     private final AuthenticationManager authenticationManager;
+    private final MessageStorageService messageStorageService;
 
     private final JwtUtil jwtUtil;
 
     private final UserDetailsServiceImpl userDetailsService;
 
     public AuthController(
-          AuthenticationManager authenticationManager,
-          JwtUtil jwtUtil,
-          UserDetailsServiceImpl userDetailsService) {
+            AuthenticationManager authenticationManager, MessageStorageService messageStorageService,
+            JwtUtil jwtUtil,
+            UserDetailsServiceImpl userDetailsService) {
         this.authenticationManager = authenticationManager;
+        this.messageStorageService = messageStorageService;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -74,6 +79,13 @@ public class AuthController {
 
         UserDataResponse userDataResponse =
                 new UserDataResponse(nameUserAuthenticated,userAuthenticated.getPosition().getDescription());
+
+        messageStorageService.addMessage(
+                MessageFormat
+                        .format(LogConstant.SUCCESSFULLY_AUTH,
+                                userAuthenticated.getName(),
+                                userAuthenticated.getLastName(),
+                                userAuthenticated.getPosition().getDescription()));
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt,userDataResponse));
 

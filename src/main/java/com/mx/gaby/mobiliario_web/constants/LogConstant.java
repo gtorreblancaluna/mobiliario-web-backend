@@ -4,10 +4,13 @@ public final class LogConstant {
 
     private LogConstant() {}
 
+    public static final String SUCCESSFULLY_AUTH = "El usuario {0} {1}, Puesto: [{2}] ha iniciado sesion.";
+
+    public static final String ERROR_TASK_EXECUTOR = "Error en servicio {0}: {1}";
+
     public static final String MSG_ALL_WORKFLOWS_PROCESSED = "✅ Todos los flujos de tarea de almacén procesados para el evento {0,number,#}.";
 
     public static final String INIT_WORK_FLOW_TASK = "▶\uFE0F Iniciando flujo de tarea para el evento {0,number,#}";
-    public static final String END_WORK_FLOW_TASK = "Flujo de tarea finalizado exitosamente, evento: {0,number,#}";
 
     public static final String ERROR_WHEN_GENERATE_TASK_EXECUTED
             = "Ocurrio un error al intentar generar las tareas para el folio: {}";
@@ -18,8 +21,8 @@ public final class LogConstant {
     public static final String MESSAGE_GENERATE_TASK_WAREHGOUSE_MANAGER =
             "Folio: {1,number,#} -> Tarea 'encargado de almacen' generada para el usuario: {0}.";
 
-    public static final String TASK_ALMACEN_SUCCESSFULY_CREATED =
-            "Folio: {1,number,#} -> Tarea almacen creada con éxito para el usuario: {0}.";
+    public static final String TASK_USERS_IN_CATEGORIES_SUCCESSFULLY_CREATED =
+            "Folio: {1,number,#} -> Tarea 'usuarios en categorias' creada con éxito para el usuario: {0}.";
 
     public static final String ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT
             = "Ocurrio un error al intentar guardar los pagos del evento. Folio: {}.";
@@ -33,8 +36,14 @@ public final class LogConstant {
     public static final String EVENT_DETAIL_UPDATED_SUCCESSFULLY
             = "Detalle evento con folio {} actualizada con exito.";
 
+    public static final String EVENT_SAVED_SUCCESSFULLY
+            = "Folio: {0,number,#} -> Evento creado con éxito, por el usuario: {1}";
+
     public static final String EVENT_UPDATED_SUCCESSFULLY
             = "Folio: {0,number,#} -> Evento actualizado con éxito, por el usuario: {1}";
+
+    public static final String INIT_UPDATE_EVENT
+            = "Iniciando actualizar evento, request body: {}";
 
     public static final String INIT_SAVE_EVENT
             = "Iniciando guardar evento, request body: {}";

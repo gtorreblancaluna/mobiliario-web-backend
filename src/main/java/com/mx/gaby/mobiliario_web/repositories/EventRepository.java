@@ -43,4 +43,12 @@ public interface EventRepository extends JpaRepository<Event, Integer>,
         """)
     void updateEvent(@Param("event") Event event);
 
+    @Query(value = "" +
+            "SELECT r.folio " +
+            "FROM renta r " +
+            "ORDER BY id_renta DESC " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Integer findLastFolio();
+
 }

@@ -1,10 +1,7 @@
 package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
-import com.mx.gaby.mobiliario_web.constants.LogConstant;
-import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
-import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
@@ -16,17 +13,17 @@ import com.mx.gaby.mobiliario_web.services.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 @Service
 @Log4j2
-public class TaskWarehouseManagerUpdateServiceImpl extends TaskWarehouseService {
+public class TaskWarehouseManagerSaveServiceImpl
+        extends TaskWarehouseService {
 
     private static final String TASK_CONTEXT_NAME
-            = ApplicationConstant.TASK_CONTEXT_NAME_UPDATE_WAREHOUSE_MANAGER;
+            = ApplicationConstant.TASK_CONTEXT_NAME_SAVE_WAREHOUSE_MANAGER;
 
-    protected TaskWarehouseManagerUpdateServiceImpl(
+    protected TaskWarehouseManagerSaveServiceImpl(
             MessageStorageService messageStorageService,
             UserService userService,
             ChoferDeliveryTaskRepository choferDeliveryTaskRepository,
@@ -37,16 +34,13 @@ public class TaskWarehouseManagerUpdateServiceImpl extends TaskWarehouseService 
 
     @Override
     protected void process(
-           EventDTO currentEvent,
-           EventDTO eventToUpdate,
-           List<DetailRentaDTO> detailToUpdate,
-           List<DetailRentaDTO> currentDetail,
-           final UserDTO userSession) throws BusinessException {
+            EventDTO currentEvent,
+            EventDTO eventToUpdate,
+            List<DetailRentaDTO> detailToUpdate,
+            List<DetailRentaDTO> currentDetail,
+            UserDTO userSession) throws BusinessException {
 
-        StatusTask statusTask = applyRulesAndGetStatus (
-                currentEvent,eventToUpdate,detailToUpdate,currentDetail);
-
-        generateTaskWarehouseManagers(eventToUpdate, statusTask, userSession);
+        generateTaskWarehouseManagers(currentEvent,StatusTask.NEW, userSession);
 
     }
 }

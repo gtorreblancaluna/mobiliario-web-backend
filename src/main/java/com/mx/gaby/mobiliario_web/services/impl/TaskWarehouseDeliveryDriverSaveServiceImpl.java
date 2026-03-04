@@ -1,10 +1,7 @@
 package com.mx.gaby.mobiliario_web.services.impl;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
-import com.mx.gaby.mobiliario_web.constants.LogConstant;
-import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
-import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
@@ -15,38 +12,33 @@ import com.mx.gaby.mobiliario_web.services.TaskWarehouseService;
 import com.mx.gaby.mobiliario_web.services.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-
-import java.text.MessageFormat;
 import java.util.List;
 
 @Service
 @Log4j2
-public class TaskWarehouseManagerUpdateServiceImpl extends TaskWarehouseService {
+public class TaskWarehouseDeliveryDriverSaveServiceImpl
+        extends TaskWarehouseService {
 
     private static final String TASK_CONTEXT_NAME
-            = ApplicationConstant.TASK_CONTEXT_NAME_UPDATE_WAREHOUSE_MANAGER;
+            = ApplicationConstant.TASK_CONTEXT_NAME_SAVE_DELIVERY_DRIVERS;
 
-    protected TaskWarehouseManagerUpdateServiceImpl(
+    protected TaskWarehouseDeliveryDriverSaveServiceImpl(
             MessageStorageService messageStorageService,
             UserService userService,
             ChoferDeliveryTaskRepository choferDeliveryTaskRepository,
             AlmacenTaskRepository almacenTaskRepository) {
-
         super(TASK_CONTEXT_NAME,messageStorageService, userService, choferDeliveryTaskRepository, almacenTaskRepository);
     }
 
     @Override
     protected void process(
-           EventDTO currentEvent,
-           EventDTO eventToUpdate,
-           List<DetailRentaDTO> detailToUpdate,
-           List<DetailRentaDTO> currentDetail,
-           final UserDTO userSession) throws BusinessException {
+            EventDTO currentEvent,
+            EventDTO eventToUpdate,
+            List<DetailRentaDTO> detailToUpdate,
+            List<DetailRentaDTO> currentDetail,
+            UserDTO userSession) throws BusinessException {
 
-        StatusTask statusTask = applyRulesAndGetStatus (
-                currentEvent,eventToUpdate,detailToUpdate,currentDetail);
-
-        generateTaskWarehouseManagers(eventToUpdate, statusTask, userSession);
+        generateTaskToDeliveryDriver(currentEvent, StatusTask.NEW, userSession);
 
     }
 }

@@ -1,8 +1,11 @@
 package com.mx.gaby.mobiliario_web.model.entitites;
 
+import com.mx.gaby.mobiliario_web.configs.converters.BooleanToStringConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
@@ -67,8 +70,14 @@ public class Event {
 
     private Float depositoGarantia;
     private Float envioRecoleccion;
-    private String mostrarPreciosPdf;
+
+    @Convert(converter = BooleanToStringConverter.class)
+    private boolean mostrarPreciosPdf;
+
+    @UpdateTimestamp
     private Timestamp updatedAt;
+
+    @CreationTimestamp
     private Timestamp createdAt;
 
 }

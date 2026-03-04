@@ -2,12 +2,15 @@ package com.mx.gaby.mobiliario_web.services;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
+import com.mx.gaby.mobiliario_web.constants.MessageConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
 import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
+import com.mx.gaby.mobiliario_web.repositories.AlmacenTaskRepository;
+import com.mx.gaby.mobiliario_web.repositories.ChoferDeliveryTaskRepository;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -20,10 +23,148 @@ import java.util.stream.Collectors;
 @Log4j2
 public abstract class TaskWarehouseService {
 
-    private final MessageStorageService messageStorageService;
 
-    protected TaskWarehouseService(MessageStorageService messageStorageService) {
+    protected final String taskContextName;
+    private final MessageStorageService messageStorageService;
+    private final UserService userService;
+    private final ChoferDeliveryTaskRepository choferDeliveryTaskRepository;
+    private final AlmacenTaskRepository almacenTaskRepository;
+
+    protected void generateTaskToDeliveryDriver(
+            final EventDTO eventToUpdate,
+            final StatusTask statusTask,
+            final UserDTO userSession) {
+
+        DeliveryDriverTask deliveryDriverTask
+                = getChoferDeliveryTask(eventToUpdate,statusTask,eventToUpdate.choferId());
+
+        deliveryDriverTask.setCreatedBy(userSession.id());
+
+        choferDeliveryTaskRepository.save(deliveryDriverTask);
+
+        String logMessage = MessageFormat.format(
+                LogConstant.MESSAGE_GENERATE_TASK_CHOFER,
+                eventToUpdate.choferName(),
+                eventToUpdate.folio());
+
+        log.info(logMessage);
+
+        messageStorageService.addMessage(logMessage);
+
+    }
+
+    protected TaskWarehouseService(
+            String taskContextName,  MessageStorageService messageStorageService,
+            UserService userService,
+            ChoferDeliveryTaskRepository choferDeliveryTaskRepository, AlmacenTaskRepository almacenTaskRepository) {
+        this.taskContextName = taskContextName;
         this.messageStorageService = messageStorageService;
+        this.userService = userService;
+        this.choferDeliveryTaskRepository = choferDeliveryTaskRepository;
+        this.almacenTaskRepository = almacenTaskRepository;
+    }
+
+    private static WarehouseTask getWarehouseTask(
+            EventDTO currentEvent, StatusTask statusTask, UserDTO userDTO) {
+
+        WarehouseTask warehouseTask = new WarehouseTask();
+
+        // Event
+        Event event = new Event();
+        event.setId(currentEvent.id());
+        warehouseTask.setEvent(event);
+
+        // status
+        WarehouseTaskStatus warehouseTaskStatus = new WarehouseTaskStatus();
+        warehouseTaskStatus.setId(statusTask.getId());
+        warehouseTask.setStatus(warehouseTaskStatus);
+
+        // type
+        AttendWarehouseTaskType attendWarehouseTaskType = new AttendWarehouseTaskType();
+        attendWarehouseTaskType.setId(1);
+        warehouseTask.setType(attendWarehouseTaskType);
+
+        // User
+        User userByCategory = new User();
+        userByCategory.setId(userDTO.id());
+        warehouseTask.setUserByCategory(userByCategory);
+
+        warehouseTask.setFgActive(true);
+
+        return warehouseTask;
+    }
+
+    protected void saveTasksForUsersInCategories(
+            final EventDTO currentEvent,
+            StatusTask statusTask,
+            final UserDTO userSession) {
+
+        // 1. Obtención de responsables (Lógica específica)
+        List<UserDTO> usersInCategories =
+                userService.getUsersInCategoriesWarehouseAndEvent(currentEvent.id());
+
+        if (usersInCategories == null || usersInCategories.isEmpty()) {
+            throw new BusinessException(MessageFormat.format(
+                    ValidationMessageConstant.NO_GENERATE_TASK_USERS_IN_CATEGORIES_NOT_FOUND, currentEvent.folio()));
+        }
+
+        for (UserDTO userDTO : usersInCategories) {
+
+            WarehouseTask warehouseTask
+                    = getWarehouseTask(currentEvent, statusTask,userDTO);
+
+            warehouseTask.setCreatedBy(userSession.id());
+
+            almacenTaskRepository.save(warehouseTask);
+
+            String logMessage = MessageFormat.format(
+                    LogConstant.TASK_USERS_IN_CATEGORIES_SUCCESSFULLY_CREATED,userDTO.name(),currentEvent.folio());
+
+            messageStorageService.addMessage(logMessage);
+            log.info(logMessage);
+        }
+
+    }
+
+    private List<UserDTO> getWarehouseManagers()
+            throws BusinessException {
+
+        List<UserDTO> users
+                = userService.getWarehouseManagers();
+
+        if (users.isEmpty()) {
+            throw new BusinessException(MessageConstant.TASK_WAREHOUSE_NO_USERS_FOUND);
+        }
+
+        return users;
+    }
+
+
+    protected void generateTaskWarehouseManagers (
+            final EventDTO eventToUpdate,
+            final StatusTask statusTask,
+            final UserDTO userSession) throws BusinessException{
+
+        List<UserDTO> warehouseManagers = getWarehouseManagers();
+
+        for (UserDTO warehouseManager : warehouseManagers) {
+
+            DeliveryDriverTask deliveryDriverTask
+                    = getChoferDeliveryTask(eventToUpdate,statusTask,warehouseManager.id());
+
+            deliveryDriverTask.setCreatedBy(userSession.id());
+
+            choferDeliveryTaskRepository.save(deliveryDriverTask);
+
+            String logMessage = MessageFormat.format(LogConstant.MESSAGE_GENERATE_TASK_WAREHGOUSE_MANAGER,
+                    warehouseManager.name(),eventToUpdate.folio());
+
+            messageStorageService.addMessage(logMessage);
+
+            log.info(logMessage);
+
+        }
+
     }
 
     protected boolean checkIfItemsHasBeenUpdated(
@@ -112,17 +253,6 @@ public abstract class TaskWarehouseService {
                 eventToUpdate,currentEvent
         );
 
-        if (eventToUpdate.tipoId().toString().equals(ApplicationConstant.TIPO_COTIZACION)
-                && !eventToUpdate.estadoId().toString().equals(ApplicationConstant.ESTADO_PENDIENTE)) {
-            throw new BusinessException(
-                    MessageFormat.format(
-                            ValidationMessageConstant.NO_TASKS_GENERATED_BY_TYPE_AND_STATUS,
-                            currentEvent.folio(),
-                            ApplicationConstant.DS_TIPO_COTIZACION,
-                            ApplicationConstant.DS_ESTADO_PENDIENTE
-            ));
-        }
-
         // 1. Extraemos variables booleanas para que los IFs se lean como lenguaje natural
         String typeId = eventToUpdate.tipoId().toString();
         String statusId = eventToUpdate.estadoId().toString();
@@ -195,7 +325,7 @@ public abstract class TaskWarehouseService {
             for (StatusTask action : values()) {
                 if (action.id.equals(id)) return action;
             }
-            throw new IllegalArgumentException(STR."Action ID no válido: \{id}");
+            throw new IllegalArgumentException("Action ID no válido");
         }
     }
 
@@ -207,23 +337,9 @@ public abstract class TaskWarehouseService {
             List<DetailRentaDTO> currentDetail,
             UserDTO userSession) throws BusinessException {
 
-        // 1. Logs o pre-validaciones globales (Dry Run)
-
-        String initWorkFlowMessage =
-                MessageFormat.format(LogConstant.INIT_WORK_FLOW_TASK,currentEvent.folio());
-
-        messageStorageService.addMessage(initWorkFlowMessage);
-        log.info(initWorkFlowMessage);
-
         // 2. Llamada al método protegido que solo las hijas conocen
        process(currentEvent, eventToUpdate, detailToUpdate,
                currentDetail, userSession);
-
-        // 3. Post-procesamiento o auditoría global
-        String endWorkFlowMessage =
-                MessageFormat.format(LogConstant.END_WORK_FLOW_TASK,currentEvent.folio());
-        messageStorageService.addMessage(endWorkFlowMessage);
-        log.info(endWorkFlowMessage);
 
     }
 

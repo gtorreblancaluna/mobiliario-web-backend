@@ -4,6 +4,7 @@ import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.constants.LogConstant;
 import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
+import com.mx.gaby.mobiliario_web.model.entitites.Event;
 import com.mx.gaby.mobiliario_web.model.entitites.EventDetail;
 import com.mx.gaby.mobiliario_web.model.entitites.Payment;
 import com.mx.gaby.mobiliario_web.records.*;
@@ -39,7 +40,10 @@ public abstract class EventService {
 
     }
 
-    private void savePayments (final EventDetailDTO eventDetailDTO)
+    private void savePayments (
+            final EventDetailDTO eventDetailDTO,
+            final Integer eventId,
+            final Integer folio)
             throws BusinessException {
 
         if (eventDetailDTO.payments().isEmpty()) {
@@ -53,7 +57,7 @@ public abstract class EventService {
             List<Payment> payments = eventDetailDTO
                     .payments()
                     .stream()
-                    .map(dto -> PaymentDTO.fromDTO(dto, eventDetailDTO.event().id()))
+                    .map(dto -> PaymentDTO.fromDTO(dto, eventId))
                     .toList();
 
             // identificar nuevos pagos y asignarle al usuario que esta en sesion.
@@ -66,20 +70,24 @@ public abstract class EventService {
 
             paymentRepository.saveAll(payments);
 
-            log.info(LogConstant.PAYMENTS_UPDATED_SUCCESSFULLY, eventDetailDTO.event().folio());
+            log.info(LogConstant.PAYMENTS_UPDATED_SUCCESSFULLY, folio);
 
         } catch (Exception exception) {
 
-            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT, eventDetailDTO.event().folio());
+            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT,
+                    folio);
+
             throw new BusinessException(
                     MessageFormat.format(
-                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT, eventDetailDTO.event()
-                                    .folio()),exception);
+                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_PAYMENTS_IN_EVENT, folio),exception);
 
         }
     }
 
-    private void saveDetails (final EventDetailDTO eventDetailDTO)
+    private void saveDetails (
+            final EventDetailDTO eventDetailDTO,
+            final Integer eventId,
+            final Integer folio)
             throws BusinessException {
 
         try {
@@ -88,26 +96,27 @@ public abstract class EventService {
                     .detail()
                     .stream()
                     .map(detailRentaDTO ->
-                         (DetailRentaDTO.fromDTO(detailRentaDTO, eventDetailDTO.event().id()))
+                         (DetailRentaDTO.fromDTO(detailRentaDTO, eventId))
                     )
                     .toList();
 
             detailEventRepository.saveAll(eventDetailList);
 
-            log.info(LogConstant.EVENT_DETAIL_UPDATED_SUCCESSFULLY, eventDetailDTO.event().folio());
+            log.info(LogConstant.EVENT_DETAIL_UPDATED_SUCCESSFULLY, folio);
 
         } catch (Exception exception) {
-            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, eventDetailDTO.event().folio());
+            log.error(LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, folio);
             throw new BusinessException(
                     MessageFormat.format(
-                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, eventDetailDTO.event()
-                                    .folio()),exception);
+                            LogConstant.ERROR_TRYING_UPDATE_OR_SAVE_EVENT_DETAIL, folio),exception);
         }
     }
 
-    private static void validateStatusAndTypeEvent(
-            String statusId, String typeId)
+    private static void validateStatusAndTypeEvent(final EventDTO eventDTO)
             throws BusinessException {
+
+        String typeId = eventDTO.tipoId().toString();
+        String statusId = eventDTO.estadoId().toString();
 
         // Regla 1: Cotización debe ser Pendiente
         if (typeId.equals(ApplicationConstant.TIPO_COTIZACION)
@@ -142,8 +151,7 @@ public abstract class EventService {
 
     private void validate (final EventDetailDTO eventDetailDTO) {
 
-        validateStatusAndTypeEvent(eventDetailDTO.event().estadoId().toString(),
-                eventDetailDTO.event().tipoId().toString());
+        validateStatusAndTypeEvent(eventDetailDTO.event());
 
         ValidateUtil.isValidRange(eventDetailDTO.event().horaEntrega());
 
@@ -216,23 +224,25 @@ public abstract class EventService {
 
     }
 
-    protected abstract void save (final EventDetailDTO eventDetailDTO);
+    protected abstract Event save (final EventDetailDTO eventDetailDTO);
 
     protected abstract void generateTasks(
             final EventDetailDTO eventDetailDTO, EventDTO currentEventDTO) throws BusinessException;
 
     // template method
-    public void executeSaveTemplate (
+    public Integer executeSaveTemplate (
             final EventDetailDTO eventDetailDTO)
                 throws BusinessException {
 
         validate(eventDetailDTO);
         // method 'save' will execute in child class.
-        save(eventDetailDTO);
+        Event eventSaved = save(eventDetailDTO);
 
-        saveDetails(eventDetailDTO);
+        saveDetails(eventDetailDTO, eventSaved.getId(), eventSaved.getFolio());
 
-        savePayments(eventDetailDTO);
+        savePayments(eventDetailDTO, eventSaved.getId(),eventSaved.getFolio());
+
+        return eventSaved.getId();
 
     }
 

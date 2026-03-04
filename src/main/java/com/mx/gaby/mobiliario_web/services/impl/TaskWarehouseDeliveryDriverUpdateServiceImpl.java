@@ -1,18 +1,17 @@
 package com.mx.gaby.mobiliario_web.services.impl;
 
-import com.mx.gaby.mobiliario_web.constants.LogConstant;
+import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
 import com.mx.gaby.mobiliario_web.exceptions.BusinessException;
-import com.mx.gaby.mobiliario_web.model.entitites.*;
 import com.mx.gaby.mobiliario_web.records.DetailRentaDTO;
 import com.mx.gaby.mobiliario_web.records.EventDTO;
 import com.mx.gaby.mobiliario_web.records.UserDTO;
+import com.mx.gaby.mobiliario_web.repositories.AlmacenTaskRepository;
 import com.mx.gaby.mobiliario_web.repositories.ChoferDeliveryTaskRepository;
 import com.mx.gaby.mobiliario_web.services.MessageStorageService;
 import com.mx.gaby.mobiliario_web.services.TaskWarehouseService;
+import com.mx.gaby.mobiliario_web.services.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-
-import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -20,39 +19,16 @@ import java.util.List;
 public class TaskWarehouseDeliveryDriverUpdateServiceImpl
         extends TaskWarehouseService {
 
-    private final MessageStorageService messageStorageService;
-    private final ChoferDeliveryTaskRepository choferDeliveryTaskRepository;
+    private static final String TASK_CONTEXT_NAME
+            = ApplicationConstant.TASK_CONTEXT_NAME_UPDATE_DELIVERY_DRIVERS;
 
-    public TaskWarehouseDeliveryDriverUpdateServiceImpl(
-            MessageStorageService messageStorageService, ChoferDeliveryTaskRepository choferDeliveryTaskRepository) {
-        super(messageStorageService);
-        this.messageStorageService = messageStorageService;
-        this.choferDeliveryTaskRepository = choferDeliveryTaskRepository;
-    }
+    protected TaskWarehouseDeliveryDriverUpdateServiceImpl(
+            MessageStorageService messageStorageService,
+            UserService userService,
+            ChoferDeliveryTaskRepository choferDeliveryTaskRepository,
+            AlmacenTaskRepository almacenTaskRepository) {
 
-
-    private void generateTaskToDeliveryDriver(
-            final EventDTO eventToUpdate,
-            final StatusTask statusTask,
-            final UserDTO userSession) {
-
-        DeliveryDriverTask deliveryDriverTask
-                = getChoferDeliveryTask(eventToUpdate,statusTask,eventToUpdate.choferId());
-
-        deliveryDriverTask.setCreatedBy(userSession.id());
-
-        choferDeliveryTaskRepository.save(deliveryDriverTask);
-
-        String logMessage = MessageFormat.format(
-                LogConstant.MESSAGE_GENERATE_TASK_CHOFER,
-                eventToUpdate.choferName(),
-                eventToUpdate.folio());
-
-        log.info(logMessage);
-
-        messageStorageService.addMessage(logMessage);
-
-
+        super(TASK_CONTEXT_NAME,messageStorageService, userService, choferDeliveryTaskRepository, almacenTaskRepository);
     }
 
     @Override

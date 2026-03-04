@@ -51,6 +51,8 @@ public final class ApplicationConstant {
     public static final String LANGUAGE = "es";
     public static final String COUNTRY = "MX";
 
+    public static final String ZONE_ID_MX = "America/Mexico_City";
+
 
     /** Formato almacenado en la base de datos */
     public static final String FORMAT_DATE_DD_MM_YYY = "dd/MM/yyyy";
@@ -62,4 +64,24 @@ public final class ApplicationConstant {
     public static final String FECHA_ENTREGA_ENTITY = "fechaEntrega";
 
     public static final String FG_ACTIVE_TRUE = "1";
+
+    public static final String TASK_CONTEXT_NAME_SAVE_USERS_IN_CATEGORIES
+            = "Servicio de tareas para usuarios en categorias cuando se crea un folio.";
+
+    public static final String TASK_CONTEXT_NAME_UPDATE_USERS_IN_CATEGORIES
+            = "Servicio de tareas para usuarios en categorias cuando se actualiza un folio.";
+
+    public static final String TASK_CONTEXT_NAME_SAVE_DELIVERY_DRIVERS
+            = "Servicio de tareas para choferes cuando se crea un folio.";
+
+    public static final String TASK_CONTEXT_NAME_UPDATE_DELIVERY_DRIVERS
+            = "Servicio de tareas para choferes cuando se actualiza un folio.";
+
+    public static final String TASK_CONTEXT_NAME_SAVE_WAREHOUSE_MANAGER
+            = "Servicio de tareas para encargados de almacén cuando se crea un folio.";
+
+    public static final String TASK_CONTEXT_NAME_UPDATE_WAREHOUSE_MANAGER
+            = "Servicio de tareas para encargados de almacén cuando se actualiza un folio.";
+
+
 }

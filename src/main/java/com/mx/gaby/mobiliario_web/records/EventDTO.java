@@ -1,7 +1,9 @@
 package com.mx.gaby.mobiliario_web.records;
 
 import com.mx.gaby.mobiliario_web.constants.ApplicationConstant;
+import com.mx.gaby.mobiliario_web.constants.ValidationMessageConstant;
 import com.mx.gaby.mobiliario_web.model.entitites.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -12,12 +14,18 @@ import java.util.Locale;
 // Utilizamos record para un DTO inmutable y conciso.
 public record EventDTO(
         Integer id,
+
+        @NotNull (message = ValidationMessageConstant.STATUS_ID_IS_REQUIRED)
         Integer estadoId,          // ID del estado (ej. Pendiente, Entregado)
-        String estadoDescription,       // Nombre del estado (ej. "Pendiente")
+        String estadoDescription,
+
+        @NotNull (message = ValidationMessageConstant.CLIENT_ID_IS_REQUIRED)
         Integer clienteId,            // ID del cliente
         String clienteNombre,      // Nombre/Identificador del cliente
         Integer usuarioId,            // ID del usuario que registró la renta
         String userName,
+
+        @NotNull (message = ValidationMessageConstant.DELIVER_DRIVER_ID_IS_REQUIRED)
         Integer choferId,
         String choferName,
 
@@ -40,12 +48,14 @@ public record EventDTO(
         // Costos
         Float depositoGarantia,
         Float envioRecoleccion,
-        String mostrarPrecios,
+        Boolean mostrarPreciosPdf,
 
         // Información de auditoría
         Timestamp updatedAt,
         Timestamp createdAt,
         String tipo,
+
+        @NotNull (message = ValidationMessageConstant.TYPE_ID_IS_REQUIRED)
         Integer tipoId
 ) {
 
@@ -118,7 +128,7 @@ public record EventDTO(
 
         event.setDepositoGarantia(eventDTO.depositoGarantia());
         event.setEnvioRecoleccion(eventDTO.envioRecoleccion());
-        event.setMostrarPreciosPdf(eventDTO.mostrarPrecios());
+        event.setMostrarPreciosPdf(eventDTO.mostrarPreciosPdf());
 
         event.setCreatedAt(eventDTO.createdAt());
         event.setUpdatedAt(eventDTO.updatedAt());
@@ -161,7 +171,7 @@ public record EventDTO(
 
                 event.getDepositoGarantia(),
                 event.getEnvioRecoleccion(),
-                event.getMostrarPreciosPdf(),
+                event.isMostrarPreciosPdf(),
 
                 event.getUpdatedAt(),
                 event.getCreatedAt(),

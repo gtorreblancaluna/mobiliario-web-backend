@@ -13,6 +13,7 @@ import com.mx.gaby.mobiliario_web.repositories.PaymentRepository;
 import com.mx.gaby.mobiliario_web.repositories.EventRepository;
 import com.mx.gaby.mobiliario_web.repositories.UserRepository;
 import com.mx.gaby.mobiliario_web.services.EventService;
+import com.mx.gaby.mobiliario_web.services.EventTaskOrchestrator;
 import com.mx.gaby.mobiliario_web.services.MessageStorageService;
 import com.mx.gaby.mobiliario_web.services.UserService;
 import jakarta.transaction.Transactional;
@@ -24,44 +25,36 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log4j2
 @Transactional
 public class EventUpdateServiceImpl extends EventService {
 
-    private final TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService;
-    private final TaskWarehouseDeliveryDriverUpdateServiceImpl taskDeliveryDriverUpdateService;
-    private final TaskWarehouseManagerUpdateServiceImpl taskWarehouseManagerUpdateService;
     private final MessageStorageService messageStorageService;
+    private final EventTaskOrchestrator taskOrchestrator;
 
     public EventUpdateServiceImpl(
-
             DetailEventRepository detailEventRepository,
             PaymentRepository paymentRepository,
-            TaskWarehouseUpdateServiceImpl taskWarehouseUpdateService,
-            TaskWarehouseDeliveryDriverUpdateServiceImpl taskDeliveryDriverUpdateService,
             UserService userService,
             UserRepository userRepository,
             EventRepository eventRepository,
-            TaskWarehouseManagerUpdateServiceImpl taskWarehouseManagerUpdateService,
-            MessageStorageService messageStorageService) {
+            MessageStorageService messageStorageService,
+            EventTaskOrchestrator taskOrchestrator) {
 
         super(eventRepository,
                 detailEventRepository,
                 paymentRepository,
                 userService, userRepository);
 
-        this.taskWarehouseUpdateService = taskWarehouseUpdateService;
-        this.taskDeliveryDriverUpdateService = taskDeliveryDriverUpdateService;
-        this.taskWarehouseManagerUpdateService = taskWarehouseManagerUpdateService;
         this.messageStorageService = messageStorageService;
+        this.taskOrchestrator = taskOrchestrator;
     }
 
 
     @Override
-    protected void save(final EventDetailDTO eventDetailDTO) {
+    protected Event save(final EventDetailDTO eventDetailDTO) {
 
         Event eventToUpdateEntity
                 = EventDTO.fromDTO(eventDetailDTO.event());
@@ -94,6 +87,8 @@ public class EventUpdateServiceImpl extends EventService {
 
         generateTasks(eventDetailDTO,currentEventDTO);
 
+        return eventToUpdateEntity;
+
     }
 
     @Override
@@ -114,53 +109,12 @@ public class EventUpdateServiceImpl extends EventService {
         List<DetailRentaDTO> detailToUpdate = eventDetailDTO.detail();
         UserDTO userSession = userService.getAuthenticatedUser();
 
-        CompletableFuture<Void> taskWarehouse = CompletableFuture.runAsync(() -> {
-            try {
-                taskWarehouseUpdateService
-                        .executeTaskWorkflow(
-                                currentEventDTO,
-                                eventToUpdate,
-                                detailToUpdate,
-                                currentDetailEvent, userSession);
-            } catch (Exception e) {
-                messageStorageService.addMessage(e.getMessage());
-            }
-        });
-
-        CompletableFuture<Void> taskDriverMan
-                = CompletableFuture.runAsync(() -> {
-            try {
-                taskDeliveryDriverUpdateService
-                        .executeTaskWorkflow(
-                                currentEventDTO,
-                                eventToUpdate,
-                                detailToUpdate,
-                                currentDetailEvent,userSession);
-            } catch (Exception e) {
-                messageStorageService.addMessage(e.getMessage());
-            }
-        });
-
-        CompletableFuture<Void> taskWarehouseManager
-                = CompletableFuture.runAsync(() -> {
-            try {
-                taskWarehouseManagerUpdateService
-                        .executeTaskWorkflow(
-                                currentEventDTO,
-                                eventToUpdate,
-                                detailToUpdate,
-                                currentDetailEvent,userSession);
-            } catch (Exception e) {
-                messageStorageService.addMessage(e.getMessage());
-            }
-        });
-
-        String allWorkflowsProcessedMessage
-                = MessageFormat.format(
-                        LogConstant.MSG_ALL_WORKFLOWS_PROCESSED,currentEventDTO.folio());
-
-        CompletableFuture.allOf(taskWarehouse, taskDriverMan, taskWarehouseManager)
-                .thenRun(() -> messageStorageService.addMessage(allWorkflowsProcessedMessage));
+        taskOrchestrator.handleTasks(
+                currentEventDTO,
+                eventToUpdate,
+                detailToUpdate,
+                currentDetailEvent,
+                userSession, true);
 
     }
 
